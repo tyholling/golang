@@ -25,7 +25,7 @@ tidy:
 vet:
 	go vet ./...
 
-check: align critic format revive secure staticcheck tidy vet
+check: critic format revive secure staticcheck tidy vet
 
 setup:
 	go install github.com/go-critic/go-critic/cmd/gocritic@latest
