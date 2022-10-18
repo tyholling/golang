@@ -13,6 +13,6 @@ message Message {
 	}
 }
 
-service ConnectionService {
+service Connection {
 	rpc Connect(stream Message) returns (stream Message);
 }
