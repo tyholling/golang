@@ -47,6 +47,7 @@ func main() {
 		return
 	}
 
+	count := 0
 	delay := time.Millisecond
 	for {
 		msg := &pb.Message{}
@@ -108,6 +109,11 @@ func main() {
 			log.Errorf("failed to send message: %s", err)
 		} else {
 			log.Infof("SEND MESSAGE: %s", msg)
+		}
+
+		count += 2
+		if count == 100000 {
+			return
 		}
 	}
 }
