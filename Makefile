@@ -2,7 +2,7 @@ build:
 	go build -o bin/ ./...
 
 align:
-	fieldalignment ./...
+	find . -name *.go ! -name *.pb.go -exec fieldalignment {} \;
 
 critic:
 	gocritic check -enableAll ./...
@@ -25,7 +25,7 @@ tidy:
 vet:
 	go vet ./...
 
-check: critic format revive secure staticcheck tidy vet
+check: align critic format revive secure staticcheck tidy vet
 
 setup:
 	go install github.com/go-critic/go-critic/cmd/gocritic@latest

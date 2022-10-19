@@ -6,6 +6,12 @@ import "google/protobuf/any.proto";
 
 option go_package = "github.com/tyholling/golang/proto/grpc";
 
+message Request {
+}
+
+message Response {
+}
+
 message Message {
 	oneof request_response {
 		google.protobuf.Any request = 1;
