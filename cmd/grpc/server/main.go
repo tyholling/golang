@@ -4,6 +4,7 @@ package main
 import (
 	"net"
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc"
@@ -15,6 +16,7 @@ var log = logrus.New()
 func init() {
 	log.Formatter = &logrus.JSONFormatter{}
 	log.Out = os.Stdout
+	log.Level = logrus.FatalLevel
 }
 
 func main() {

@@ -17,6 +17,7 @@ var log = logrus.New()
 func init() {
 	log.Formatter = &logrus.JSONFormatter{}
 	log.Out = os.Stdout
+	log.Level = logrus.FatalLevel
 }
 
 func main() {
