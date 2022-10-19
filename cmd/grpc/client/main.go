@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -19,15 +20,49 @@ func init() {
 
 func main() {
 	log.Info("client: started")
+	defer log.Info("client: stopped")
 
-	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	target := "localhost:65000"
+	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to connect: %s", err)
+		log.Errorf("failed to connect to channel: %s", err)
+		return
 	}
 	defer conn.Close()
 
-	message := &pb.Message{}
-	log.Infof("message: %v", message)
+	client := pb.NewConnectionClient(conn)
+	stream, err := client.Connect(context.Background())
+	if err != nil {
+		log.Errorf("failed to connect to server: %s", err)
+		return
+	}
 
-	log.Info("client: stopped")
+	err = stream.Send(&pb.Message{
+		RequestResponse: &pb.Message_Request{},
+	})
+	if err != nil {
+		log.Errorf("failed to send message: %s", err)
+		return
+	}
+
+	for {
+		msgIn, err := stream.Recv()
+		if err != nil {
+			log.Errorf("failed to read message: %s", err)
+			continue
+		}
+		if msgIn != nil {
+			log.Infof("RECV MESSAGE: %s", msgIn)
+		}
+
+		msg := &pb.Message{
+			RequestResponse: &pb.Message_Response{},
+		}
+		err = stream.Send(msg)
+		if err != nil {
+			log.Errorf("failed to send message: %s", err)
+		} else {
+			log.Infof("SEND MESSAGE: %s", msg)
+		}
+	}
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 var log = logrus.New()
@@ -20,24 +19,28 @@ func init() {
 
 func main() {
 	log.Info("server: started")
+	defer log.Info("server: stopped")
 
 	conn, err := net.Listen("tcp", "localhost:65000")
 	if err != nil {
-		log.Fatalf("failed to listen: %s", err)
+		log.Errorf("failed to listen: %s", err)
+		return
 	}
 
 	server := grpc.NewServer()
 	pb.RegisterConnectionServer(server, &connectionServer{})
-	server.Serve(conn)
-
-	log.Info("server: stopped")
+	err = server.Serve(conn)
+	if err != nil {
+		log.Errorf("failed to start server: %s", err)
+		return
+	}
 }
 
 type connectionServer struct {
 	pb.UnimplementedConnectionServer
 }
 
-func (s *connectionServer) Connection(stream pb.Connection_ConnectServer) error {
+func (s *connectionServer) Connect(stream pb.Connection_ConnectServer) error {
 	for {
 		msgIn, err := stream.Recv()
 		if err != nil {
@@ -47,13 +50,14 @@ func (s *connectionServer) Connection(stream pb.Connection_ConnectServer) error 
 			log.Infof("RECV MESSAGE: %s", msgIn)
 		}
 
-		body, err := anypb.New(&pb.Response{})
 		msg := &pb.Message{
-			RequestResponse: &pb.Message_Response{
-				Response: body,
-			},
+			RequestResponse: &pb.Message_Response{},
 		}
-		stream.Send(msg)
-		log.Infof("SEND MESSAGE: %s", msg)
+		err = stream.Send(msg)
+		if err != nil {
+			log.Errorf("failed to send message: %s", err)
+		} else {
+			log.Infof("SEND MESSAGE: %s", msg)
+		}
 	}
 }
