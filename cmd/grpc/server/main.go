@@ -42,17 +42,15 @@ type connectionServer struct {
 
 func (s *connectionServer) Connect(stream pb.Connection_ConnectServer) error {
 	for {
-		msgIn, err := stream.Recv()
+		msg, err := stream.Recv()
 		if err != nil {
 			return err
 		}
-		if msgIn != nil {
-			log.Infof("RECV MESSAGE: %s", msgIn)
+		if msg != nil {
+			log.Infof("RECV MESSAGE: %s", msg)
 		}
 
-		msg := &pb.Message{
-			RequestResponse: &pb.Message_Response{},
-		}
+		msg.RequestResponse = &pb.Message_Response{}
 		err = stream.Send(msg)
 		if err != nil {
 			log.Errorf("failed to send message: %s", err)
