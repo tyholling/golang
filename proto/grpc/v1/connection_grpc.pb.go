@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             (unknown)
-// source: proto/grpc/connection.proto
+// source: proto/grpc/v1/connection.proto
 
 package grpc
 
@@ -34,7 +34,7 @@ func NewConnectionServiceClient(cc grpc.ClientConnInterface) ConnectionServiceCl
 }
 
 func (c *connectionServiceClient) Connect(ctx context.Context, opts ...grpc.CallOption) (ConnectionService_ConnectClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ConnectionService_ServiceDesc.Streams[0], "/grpc.ConnectionService/Connect", opts...)
+	stream, err := c.cc.NewStream(ctx, &ConnectionService_ServiceDesc.Streams[0], "/proto.grpc.v1.ConnectionService/Connect", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (x *connectionServiceConnectServer) Recv() (*ConnectRequest, error) {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ConnectionService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpc.ConnectionService",
+	ServiceName: "proto.grpc.v1.ConnectionService",
 	HandlerType: (*ConnectionServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
@@ -133,5 +133,5 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "proto/grpc/connection.proto",
+	Metadata: "proto/grpc/v1/connection.proto",
 }

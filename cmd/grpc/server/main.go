@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
-	pb "github.com/tyholling/golang/proto/grpc"
+	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
 )
 
