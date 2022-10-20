@@ -16,7 +16,17 @@ var log = logrus.New()
 
 func init() {
 	log.Formatter = &logrus.JSONFormatter{}
-	log.Out = os.Stdout
+
+	err := os.MkdirAll("log", 0o0644)
+	if err != nil {
+		log.Fatalf("failed to create log directory: %s", err)
+	}
+	file, err := os.Create("log/client.log")
+	if err != nil {
+		log.Fatalf("failed to create log file: %s", err)
+	} else {
+		log.Out = file
+	}
 }
 
 func main() {
