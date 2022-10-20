@@ -18,117 +18,117 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ConnectionClient is the client API for Connection service.
+// ConnectionServiceClient is the client API for ConnectionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ConnectionClient interface {
-	Connect(ctx context.Context, opts ...grpc.CallOption) (Connection_ConnectClient, error)
+type ConnectionServiceClient interface {
+	Connect(ctx context.Context, opts ...grpc.CallOption) (ConnectionService_ConnectClient, error)
 }
 
-type connectionClient struct {
+type connectionServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewConnectionClient(cc grpc.ClientConnInterface) ConnectionClient {
-	return &connectionClient{cc}
+func NewConnectionServiceClient(cc grpc.ClientConnInterface) ConnectionServiceClient {
+	return &connectionServiceClient{cc}
 }
 
-func (c *connectionClient) Connect(ctx context.Context, opts ...grpc.CallOption) (Connection_ConnectClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Connection_ServiceDesc.Streams[0], "/grpc.Connection/Connect", opts...)
+func (c *connectionServiceClient) Connect(ctx context.Context, opts ...grpc.CallOption) (ConnectionService_ConnectClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ConnectionService_ServiceDesc.Streams[0], "/grpc.ConnectionService/Connect", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &connectionConnectClient{stream}
+	x := &connectionServiceConnectClient{stream}
 	return x, nil
 }
 
-type Connection_ConnectClient interface {
-	Send(*Message) error
-	Recv() (*Message, error)
+type ConnectionService_ConnectClient interface {
+	Send(*ConnectRequest) error
+	Recv() (*ConnectResponse, error)
 	grpc.ClientStream
 }
 
-type connectionConnectClient struct {
+type connectionServiceConnectClient struct {
 	grpc.ClientStream
 }
 
-func (x *connectionConnectClient) Send(m *Message) error {
+func (x *connectionServiceConnectClient) Send(m *ConnectRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *connectionConnectClient) Recv() (*Message, error) {
-	m := new(Message)
+func (x *connectionServiceConnectClient) Recv() (*ConnectResponse, error) {
+	m := new(ConnectResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// ConnectionServer is the server API for Connection service.
-// All implementations must embed UnimplementedConnectionServer
+// ConnectionServiceServer is the server API for ConnectionService service.
+// All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
-type ConnectionServer interface {
-	Connect(Connection_ConnectServer) error
-	mustEmbedUnimplementedConnectionServer()
+type ConnectionServiceServer interface {
+	Connect(ConnectionService_ConnectServer) error
+	mustEmbedUnimplementedConnectionServiceServer()
 }
 
-// UnimplementedConnectionServer must be embedded to have forward compatible implementations.
-type UnimplementedConnectionServer struct {
+// UnimplementedConnectionServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedConnectionServiceServer struct {
 }
 
-func (UnimplementedConnectionServer) Connect(Connection_ConnectServer) error {
+func (UnimplementedConnectionServiceServer) Connect(ConnectionService_ConnectServer) error {
 	return status.Errorf(codes.Unimplemented, "method Connect not implemented")
 }
-func (UnimplementedConnectionServer) mustEmbedUnimplementedConnectionServer() {}
+func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
-// UnsafeConnectionServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ConnectionServer will
+// UnsafeConnectionServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ConnectionServiceServer will
 // result in compilation errors.
-type UnsafeConnectionServer interface {
-	mustEmbedUnimplementedConnectionServer()
+type UnsafeConnectionServiceServer interface {
+	mustEmbedUnimplementedConnectionServiceServer()
 }
 
-func RegisterConnectionServer(s grpc.ServiceRegistrar, srv ConnectionServer) {
-	s.RegisterService(&Connection_ServiceDesc, srv)
+func RegisterConnectionServiceServer(s grpc.ServiceRegistrar, srv ConnectionServiceServer) {
+	s.RegisterService(&ConnectionService_ServiceDesc, srv)
 }
 
-func _Connection_Connect_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ConnectionServer).Connect(&connectionConnectServer{stream})
+func _ConnectionService_Connect_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ConnectionServiceServer).Connect(&connectionServiceConnectServer{stream})
 }
 
-type Connection_ConnectServer interface {
-	Send(*Message) error
-	Recv() (*Message, error)
+type ConnectionService_ConnectServer interface {
+	Send(*ConnectResponse) error
+	Recv() (*ConnectRequest, error)
 	grpc.ServerStream
 }
 
-type connectionConnectServer struct {
+type connectionServiceConnectServer struct {
 	grpc.ServerStream
 }
 
-func (x *connectionConnectServer) Send(m *Message) error {
+func (x *connectionServiceConnectServer) Send(m *ConnectResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *connectionConnectServer) Recv() (*Message, error) {
-	m := new(Message)
+func (x *connectionServiceConnectServer) Recv() (*ConnectRequest, error) {
+	m := new(ConnectRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// Connection_ServiceDesc is the grpc.ServiceDesc for Connection service.
+// ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Connection_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpc.Connection",
-	HandlerType: (*ConnectionServer)(nil),
+var ConnectionService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "grpc.ConnectionService",
+	HandlerType: (*ConnectionServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Connect",
-			Handler:       _Connection_Connect_Handler,
+			Handler:       _ConnectionService_Connect_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},

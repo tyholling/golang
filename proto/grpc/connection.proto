@@ -6,13 +6,16 @@ import "google/protobuf/any.proto";
 
 option go_package = "github.com/tyholling/golang/proto/grpc";
 
-message Message {
-	oneof request_response {
-		google.protobuf.Any request = 1;
-		google.protobuf.Any response = 2;
-	}
+message ConnectRequest {
+	optional google.protobuf.Any request = 1;
+	optional google.protobuf.Any response = 2;
 }
 
-service Connection {
-	rpc Connect(stream Message) returns (stream Message);
+message ConnectResponse {
+	optional google.protobuf.Any request = 1;
+	optional google.protobuf.Any response = 2;
+}
+
+service ConnectionService {
+	rpc Connect(stream ConnectRequest) returns (stream ConnectResponse);
 }

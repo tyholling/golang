@@ -17,7 +17,6 @@ var log = logrus.New()
 func init() {
 	log.Formatter = &logrus.JSONFormatter{}
 	log.Out = os.Stdout
-	log.Level = logrus.FatalLevel
 }
 
 func main() {
@@ -32,30 +31,27 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pb.NewConnectionClient(conn)
+	client := pb.NewConnectionServiceClient(conn)
 	stream, err := client.Connect(context.Background())
 	if err != nil {
 		log.Errorf("failed to connect to server: %s", err)
 		return
 	}
 
-	err = stream.Send(&pb.Message{
-		RequestResponse: &pb.Message_Request{},
-	})
+	err = stream.Send(&pb.ConnectRequest{})
 	if err != nil {
-		log.Errorf("failed to send message: %s", err)
+		log.Errorf("failed to send: %s", err)
 		return
 	}
 
-	count := 0
 	delay := time.Millisecond
 	for {
-		msg := &pb.Message{}
+		msg := &pb.ConnectResponse{}
 		if stream != nil {
 			msg, err = stream.Recv()
 		}
 		if stream == nil || err != nil {
-			log.Errorf("failed to read message: %s", err)
+			log.Errorf("failed to receive: %s", err)
 
 			log.Infof("reconnecting after delay: %v", delay)
 			time.Sleep(delay)
@@ -80,7 +76,7 @@ func main() {
 			}
 			log.Infof("connected to channel: %v", conn)
 
-			client = pb.NewConnectionClient(conn)
+			client = pb.NewConnectionServiceClient(conn)
 			stream, err = client.Connect(context.Background())
 			if err != nil {
 				log.Errorf("failed to connect to server: %s", err)
@@ -88,11 +84,9 @@ func main() {
 			}
 			log.Infof("connected to server: %v", stream)
 
-			err = stream.Send(&pb.Message{
-				RequestResponse: &pb.Message_Request{},
-			})
+			err = stream.Send(&pb.ConnectRequest{})
 			if err != nil {
-				log.Errorf("failed to send message: %s", err)
+				log.Errorf("failed to send: %s", err)
 			}
 
 			continue
@@ -100,20 +94,15 @@ func main() {
 		delay = time.Millisecond // reset backoff
 
 		if msg != nil {
-			log.Infof("RECV MESSAGE: %s", msg)
+			log.Infof("RECV: %s", msg)
 		}
 
-		msg.RequestResponse = &pb.Message_Response{}
-		err = stream.Send(msg)
+		msgOut := &pb.ConnectRequest{}
+		err = stream.Send(msgOut)
 		if err != nil {
-			log.Errorf("failed to send message: %s", err)
+			log.Errorf("failed to send: %s", err)
 		} else {
-			log.Infof("SEND MESSAGE: %s", msg)
-		}
-
-		count += 2
-		if count == 100000 {
-			return
+			log.Infof("SEND: %s", msg)
 		}
 	}
 }

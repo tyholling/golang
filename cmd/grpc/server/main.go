@@ -15,7 +15,6 @@ var log = logrus.New()
 func init() {
 	log.Formatter = &logrus.JSONFormatter{}
 	log.Out = os.Stdout
-	log.Level = logrus.FatalLevel
 }
 
 func main() {
@@ -29,7 +28,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	pb.RegisterConnectionServer(server, &connectionServer{})
+	pb.RegisterConnectionServiceServer(server, &connectionServer{})
 	err = server.Serve(conn)
 	if err != nil {
 		log.Errorf("failed to start server: %s", err)
@@ -38,25 +37,25 @@ func main() {
 }
 
 type connectionServer struct {
-	pb.UnimplementedConnectionServer
+	pb.UnimplementedConnectionServiceServer
 }
 
-func (s *connectionServer) Connect(stream pb.Connection_ConnectServer) error {
+func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) error {
 	for {
-		msg, err := stream.Recv()
+		msgIn, err := stream.Recv()
 		if err != nil {
 			return err
 		}
-		if msg != nil {
-			log.Infof("RECV MESSAGE: %s", msg)
+		if msgIn != nil {
+			log.Infof("RECV: %s", msgIn)
 		}
 
-		msg.RequestResponse = &pb.Message_Response{}
-		err = stream.Send(msg)
+		msgOut := &pb.ConnectResponse{}
+		err = stream.Send(msgOut)
 		if err != nil {
-			log.Errorf("failed to send message: %s", err)
+			log.Errorf("failed to send: %s", err)
 		} else {
-			log.Infof("SEND MESSAGE: %s", msg)
+			log.Infof("SEND: %s", msgOut)
 		}
 	}
 }
