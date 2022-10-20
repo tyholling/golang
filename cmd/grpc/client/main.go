@@ -79,5 +79,6 @@ func main() {
 		}
 	}()
 
+	messageChan <- struct{}{}
 	wg.Wait()
 }

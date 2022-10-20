@@ -65,7 +65,6 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 				log.Errorf("failed to send: %s", err)
 				continue
 			}
-
 			log.Debugf("send: %s", msg)
 		}
 	}()
@@ -79,13 +78,10 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 				log.Errorf("failed to receive: %s", err)
 				continue
 			}
-
 			messageChan <- struct{}{}
 			log.Debugf("receive: %s", msg)
 		}
 	}()
-
-	messageChan <- struct{}{}
 
 	wg.Wait()
 	return nil
