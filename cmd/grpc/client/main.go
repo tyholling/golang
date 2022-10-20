@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 	"os"
-	"time"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
@@ -48,71 +48,36 @@ func main() {
 		return
 	}
 
-	err = stream.Send(&pb.ConnectRequest{})
-	if err != nil {
-		log.Errorf("failed to send: %s", err)
-		return
-	}
+	wg := sync.WaitGroup{}
+	messageChan := make(chan struct{})
 
-	delay := time.Millisecond
-	for {
-		msg := &pb.ConnectResponse{}
-		if stream != nil {
-			msg, err = stream.Recv()
-		}
-		if stream == nil || err != nil {
-			log.Errorf("failed to receive: %s", err)
-
-			log.Infof("reconnecting after delay: %v", delay)
-			time.Sleep(delay)
-
-			if delay < time.Minute {
-				// increase backoff
-				delay *= 2
-				if delay > time.Minute {
-					delay = time.Minute
-				}
-			}
-
-			err = conn.Close()
-			if err != nil {
-				log.Warningf("failed to close connection: %s", err)
-			}
-
-			conn, err = grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
-			if err != nil {
-				log.Errorf("failed to connect to channel: %s", err)
-				continue
-			}
-			log.Infof("connected to channel: %v", conn)
-
-			client = pb.NewConnectionServiceClient(conn)
-			stream, err = client.Connect(context.Background())
-			if err != nil {
-				log.Errorf("failed to connect to server: %s", err)
-				continue
-			}
-			log.Infof("connected to server: %v", stream)
-
-			err = stream.Send(&pb.ConnectRequest{})
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for range messageChan {
+			msg := &pb.ConnectRequest{}
+			err := stream.Send(msg)
 			if err != nil {
 				log.Errorf("failed to send: %s", err)
+				continue
 			}
-
-			continue
+			log.Debugf("send: %s", msg)
 		}
-		delay = time.Millisecond // reset backoff
+	}()
 
-		if msg != nil {
-			log.Debugf("RECV: %s", msg)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			msg, err := stream.Recv()
+			if err != nil {
+				log.Errorf("failed to receive: %s", err)
+				continue
+			}
+			messageChan <- struct{}{}
+			log.Debugf("receive: %s", msg)
 		}
+	}()
 
-		msgOut := &pb.ConnectRequest{}
-		err = stream.Send(msgOut)
-		if err != nil {
-			log.Errorf("failed to send: %s", err)
-		} else {
-			log.Debugf("SEND: %s", msg)
-		}
-	}
+	wg.Wait()
 }

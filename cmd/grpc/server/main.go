@@ -4,6 +4,7 @@ package main
 import (
 	"net"
 	"os"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
@@ -51,21 +52,41 @@ type connectionServer struct {
 }
 
 func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) error {
-	for {
-		msgIn, err := stream.Recv()
-		if err != nil {
-			return err
-		}
-		if msgIn != nil {
-			log.Debugf("RECV: %s", msgIn)
-		}
+	wg := sync.WaitGroup{}
+	messageChan := make(chan struct{})
 
-		msgOut := &pb.ConnectResponse{}
-		err = stream.Send(msgOut)
-		if err != nil {
-			log.Errorf("failed to send: %s", err)
-		} else {
-			log.Debugf("SEND: %s", msgOut)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for range messageChan {
+			msg := &pb.ConnectResponse{}
+			err := stream.Send(msg)
+			if err != nil {
+				log.Errorf("failed to send: %s", err)
+				continue
+			}
+
+			log.Debugf("send: %s", msg)
 		}
-	}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			msg, err := stream.Recv()
+			if err != nil {
+				log.Errorf("failed to receive: %s", err)
+				continue
+			}
+
+			messageChan <- struct{}{}
+			log.Debugf("receive: %s", msg)
+		}
+	}()
+
+	messageChan <- struct{}{}
+
+	wg.Wait()
+	return nil
 }
