@@ -94,7 +94,7 @@ func main() {
 		delay = time.Millisecond // reset backoff
 
 		if msg != nil {
-			log.Infof("RECV: %s", msg)
+			log.Debugf("RECV: %s", msg)
 		}
 
 		msgOut := &pb.ConnectRequest{}
@@ -102,7 +102,7 @@ func main() {
 		if err != nil {
 			log.Errorf("failed to send: %s", err)
 		} else {
-			log.Infof("SEND: %s", msg)
+			log.Debugf("SEND: %s", msg)
 		}
 	}
 }

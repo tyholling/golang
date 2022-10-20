@@ -47,7 +47,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 			return err
 		}
 		if msgIn != nil {
-			log.Infof("RECV: %s", msgIn)
+			log.Debugf("RECV: %s", msgIn)
 		}
 
 		msgOut := &pb.ConnectResponse{}
@@ -55,7 +55,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		if err != nil {
 			log.Errorf("failed to send: %s", err)
 		} else {
-			log.Infof("SEND: %s", msgOut)
+			log.Debugf("SEND: %s", msgOut)
 		}
 	}
 }
