@@ -1,4 +1,4 @@
-// command client
+// Command client
 package main
 
 import (
@@ -6,16 +6,14 @@ import (
 	"os"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var log = logrus.New()
-
 func init() {
-	log.Formatter = &logrus.JSONFormatter{}
+	log.SetFormatter(&log.JSONFormatter{})
 
 	err := os.MkdirAll("log", 0o0644)
 	if err != nil {
@@ -25,7 +23,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("failed to create log file: %s", err)
 	} else {
-		log.Out = file
+		log.SetOutput(file)
 	}
 }
 
