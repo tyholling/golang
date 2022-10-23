@@ -9,6 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // Server represents the grpc server
@@ -65,8 +67,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 }
 
 func handleSend(stream pb.ConnectionService_ConnectServer, msgChan <-chan *pb.ConnectResponse) {
-	for range msgChan {
-		msg := &pb.ConnectResponse{}
+	for msg := range msgChan {
 		err := stream.Send(msg)
 		if err != nil {
 			log.Errorf("failed to send: %s", err)
@@ -86,6 +87,26 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 
 		if msg.Request != nil {
 			log.Debugf("received request: %s", msg)
+
+			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			if v, ok := request.(*pb.PingRequest); ok {
+				response, err := anypb.New(&pb.PingResponse{
+					Timestamp: v.Timestamp,
+				})
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+				msg := &pb.ConnectResponse{
+					Response: response,
+				}
+				msgChan <- msg
+			}
 		} else if msg.Response != nil {
 			log.Debugf("received response: %s", msg)
 		}
