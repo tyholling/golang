@@ -51,31 +51,39 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for range messageChan {
-			msg := &pb.ConnectResponse{}
-			err := stream.Send(msg)
-			if err != nil {
-				log.Errorf("failed to send: %s", err)
-				continue
-			}
-			log.Debugf("send: %s", msg)
-		}
+		handleSend(stream, messageChan)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for {
-			msg, err := stream.Recv()
-			if err != nil {
-				log.Errorf("failed to receive: %s", err)
-				continue
-			}
-			messageChan <- struct{}{}
-			log.Debugf("receive: %s", msg)
-		}
+		handleRecv(stream, messageChan)
 	}()
 
 	wg.Wait()
 	return nil
+}
+
+func handleSend(stream pb.ConnectionService_ConnectServer, messageChan <-chan struct{}) {
+	for range messageChan {
+		msg := &pb.ConnectResponse{}
+		err := stream.Send(msg)
+		if err != nil {
+			log.Errorf("failed to send: %s", err)
+			continue
+		}
+		log.Debugf("send: %s", msg)
+	}
+}
+
+func handleRecv(stream pb.ConnectionService_ConnectServer, messageChan chan<- struct{}) {
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			log.Errorf("failed to receive: %s", err)
+			continue
+		}
+		messageChan <- struct{}{}
+		log.Debugf("receive: %s", msg)
+	}
 }

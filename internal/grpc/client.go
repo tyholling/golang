@@ -47,31 +47,39 @@ func (c *Client) Start() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for range messageChan {
-			msg := &pb.ConnectRequest{}
-			err := c.stream.Send(msg)
-			if err != nil {
-				log.Errorf("failed to send: %s", err)
-				continue
-			}
-			log.Debugf("send: %s", msg)
-		}
+		c.handleSend(messageChan)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for {
-			msg, err := c.stream.Recv()
-			if err != nil {
-				log.Errorf("failed to receive: %s", err)
-				continue
-			}
-			messageChan <- struct{}{}
-			log.Debugf("receive: %s", msg)
-		}
+		c.handleRecv(messageChan)
 	}()
 
 	messageChan <- struct{}{}
 	wg.Wait()
+}
+
+func (c *Client) handleSend(messageChan <-chan struct{}) {
+	for range messageChan {
+		msg := &pb.ConnectRequest{}
+		err := c.stream.Send(msg)
+		if err != nil {
+			log.Errorf("failed to send: %s", err)
+			continue
+		}
+		log.Debugf("send: %s", msg)
+	}
+}
+
+func (c *Client) handleRecv(messageChan chan<- struct{}) {
+	for {
+		msg, err := c.stream.Recv()
+		if err != nil {
+			log.Errorf("failed to receive: %s", err)
+			continue
+		}
+		messageChan <- struct{}{}
+		log.Debugf("receive: %s", msg)
+	}
 }
