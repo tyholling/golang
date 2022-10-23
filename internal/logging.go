@@ -11,6 +11,7 @@ import (
 // SetupLogging is used to setup logging
 func SetupLogging(path string) {
 	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
 
 	err := os.MkdirAll("log", 0o0644)
 	if err != nil {

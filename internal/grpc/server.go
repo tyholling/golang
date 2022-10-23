@@ -46,26 +46,26 @@ type connectionServer struct {
 // Connect runs the handlers to send and receive grpc messages
 func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) error {
 	wg := sync.WaitGroup{}
-	messageChan := make(chan struct{})
+	msgChan := make(chan *pb.ConnectResponse)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		handleSend(stream, messageChan)
+		handleSend(stream, msgChan)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		handleRecv(stream, messageChan)
+		handleRecv(stream, msgChan)
 	}()
 
 	wg.Wait()
 	return nil
 }
 
-func handleSend(stream pb.ConnectionService_ConnectServer, messageChan <-chan struct{}) {
-	for range messageChan {
+func handleSend(stream pb.ConnectionService_ConnectServer, msgChan <-chan *pb.ConnectResponse) {
+	for range msgChan {
 		msg := &pb.ConnectResponse{}
 		err := stream.Send(msg)
 		if err != nil {
@@ -76,14 +76,18 @@ func handleSend(stream pb.ConnectionService_ConnectServer, messageChan <-chan st
 	}
 }
 
-func handleRecv(stream pb.ConnectionService_ConnectServer, messageChan chan<- struct{}) {
+func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.ConnectResponse) {
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
 			log.Errorf("failed to receive: %s", err)
 			continue
 		}
-		messageChan <- struct{}{}
-		log.Debugf("receive: %s", msg)
+
+		if msg.Request != nil {
+			log.Debugf("received request: %s", msg)
+		} else if msg.Response != nil {
+			log.Debugf("received response: %s", msg)
+		}
 	}
 }

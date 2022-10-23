@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto.grpc.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/tyholling/golang/proto/grpc";
+
+message PingRequest {
+  google.protobuf.Timestamp timestamp = 1; 
+}
+
+message PingResponse {
+  google.protobuf.Timestamp timestamp = 1;
+}
