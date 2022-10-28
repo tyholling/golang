@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Server represents the grpc server
@@ -93,9 +94,9 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 				log.Error(err)
 				continue
 			}
-			if v, ok := request.(*pb.PingRequest); ok {
-				response, err := anypb.New(&pb.PingResponse{
-					Timestamp: v.Timestamp,
+			if _, ok := request.(*pb.PingRequest); ok {
+				request, err := anypb.New(&pb.PingRequest{
+					Timestamp: timestamppb.Now(),
 				})
 				if err != nil {
 					log.Error(err)
@@ -103,7 +104,7 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 				}
 
 				msg := &pb.ConnectResponse{
-					Response: response,
+					Request: request,
 				}
 				msgChan <- msg
 			}

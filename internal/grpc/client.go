@@ -10,6 +10,7 @@ import (
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -94,6 +95,24 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 
 		if msg.Request != nil {
 			log.Debugf("received request: %s", msg)
+
+			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			if _, ok := request.(*pb.PingRequest); ok {
+				request, err := anypb.New(&pb.PingRequest{
+					Timestamp: timestamppb.Now(),
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
+				msg := &pb.ConnectRequest{
+					Request: request,
+				}
+				msgChan <- msg
+			}
 		} else if msg.Response != nil {
 			log.Debugf("received response: %s", msg)
 		}
