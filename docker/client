@@ -1,0 +1,15 @@
+FROM builder as builder
+
+WORKDIR /root
+
+COPY . .
+
+RUN make build check
+
+FROM golang
+
+WORKDIR /root
+
+COPY --from=builder /root/bin/client /root
+
+ENTRYPOINT [ "/root/client" ]

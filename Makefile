@@ -40,3 +40,7 @@ setup:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 	go install mvdan.cc/gofumpt@latest
+
+images:
+	docker build -t client -f docker/client .
+	docker build -t server -f docker/server .

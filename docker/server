@@ -1,0 +1,17 @@
+FROM builder as builder
+
+WORKDIR /root
+
+COPY . .
+
+RUN make build check
+
+FROM golang
+
+WORKDIR /root
+
+COPY --from=builder /root/bin/server /root
+
+EXPOSE 65000
+
+ENTRYPOINT [ "/root/server" ]
