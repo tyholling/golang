@@ -42,5 +42,5 @@ setup:
 	go install mvdan.cc/gofumpt@latest
 
 images:
-	docker build -t client -f deploy/client .
-	docker build -t server -f deploy/server .
+	podman build -t localhost:5000/client -f deploy/client .
+	podman build -t localhost:5000/server -f deploy/server .

@@ -4,14 +4,12 @@ WORKDIR /root
 
 COPY . .
 
-RUN make build check
+RUN make
 
-FROM golang
+FROM alpine
 
-WORKDIR /root
-
-COPY --from=builder /root/bin/server /root
+COPY --from=builder /root/bin/server /server
 
 EXPOSE 65000
 
-ENTRYPOINT [ "/root/server" ]
+ENTRYPOINT ["/server"]

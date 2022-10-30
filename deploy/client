@@ -4,12 +4,10 @@ WORKDIR /root
 
 COPY . .
 
-RUN make build check
+RUN make
 
-FROM golang
+FROM alpine
 
-WORKDIR /root
+COPY --from=builder /root/bin/client /client
 
-COPY --from=builder /root/bin/client /root
-
-ENTRYPOINT [ "/root/client" ]
+ENTRYPOINT ["/client"]
