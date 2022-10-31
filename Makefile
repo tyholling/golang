@@ -17,7 +17,7 @@ revive:
 	revive -formatter stylish ./...
 
 secure:
-	gosec -quiet -show-ignored ./...
+	gosec -quiet ./...
 
 staticcheck:
 	staticcheck -show-ignored ./...
@@ -43,4 +43,6 @@ setup:
 
 images:
 	podman build -t localhost:5000/client -f deploy/client .
+	podman push localhost:5000/client
 	podman build -t localhost:5000/server -f deploy/server .
+	podman push localhost:5000/server
