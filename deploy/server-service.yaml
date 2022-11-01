@@ -6,7 +6,5 @@ spec:
   selector:
     app: server
   ports:
-  - protocol: TCP
-    port: 65000
-    targetPort: 65000
+  - port: 65000
     name: grpc
