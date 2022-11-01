@@ -2,6 +2,8 @@
 package internal
 
 import (
+	"os"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -9,4 +11,5 @@ import (
 func SetupLogging(path string) {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetLevel(log.DebugLevel)
+	log.SetOutput(os.Stdout)
 }
