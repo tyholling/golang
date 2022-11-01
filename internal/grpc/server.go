@@ -72,7 +72,7 @@ func handleSend(stream pb.ConnectionService_ConnectServer, msgChan <-chan *pb.Co
 		err := stream.Send(msg)
 		if err != nil {
 			log.Errorf("failed to send: %s", err)
-			continue
+			return
 		}
 		log.Debugf("send: %s", msg)
 	}
@@ -83,7 +83,7 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 		msg, err := stream.Recv()
 		if err != nil {
 			log.Errorf("failed to receive: %s", err)
-			continue
+			return
 		}
 
 		if msg.Request != nil {

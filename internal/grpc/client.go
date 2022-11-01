@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
@@ -59,17 +60,8 @@ func (c *Client) Start() {
 		c.handleRecv(msgChan)
 	}()
 
-	// send ping request
-	request, err := anypb.New(&pb.PingRequest{
-		Timestamp: timestamppb.Now(),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	msg := &pb.ConnectRequest{
-		Request: request,
-	}
-	msgChan <- msg
+	// send ping request to start the loop
+	msgChan <- newPingRequest()
 
 	wg.Wait()
 }
@@ -90,6 +82,8 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 		msg, err := c.stream.Recv()
 		if err != nil {
 			log.Errorf("failed to receive: %s", err)
+			c.reconnect()
+			msgChan <- newPingRequest()
 			continue
 		}
 
@@ -117,4 +111,29 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 			log.Debugf("received response: %s", msg)
 		}
 	}
+}
+
+func (c *Client) reconnect() {
+	for {
+		stream, err := c.client.Connect(context.Background())
+		if err == nil {
+			c.stream = stream
+			log.Info("reconnected to server")
+			break
+		}
+		time.Sleep(time.Second)
+	}
+}
+
+func newPingRequest() *pb.ConnectRequest {
+	request, err := anypb.New(&pb.PingRequest{
+		Timestamp: timestamppb.Now(),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	msg := &pb.ConnectRequest{
+		Request: request,
+	}
+	return msg
 }
