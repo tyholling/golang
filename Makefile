@@ -46,3 +46,5 @@ images:
 	podman push localhost:5000/client
 	podman build -t localhost:5000/server -f deploy/server .
 	podman push localhost:5000/server
+	podman build -t localhost:5000/http -f deploy/http .
+	podman push localhost:5000/http

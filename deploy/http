@@ -1,0 +1,13 @@
+FROM builder as builder
+
+WORKDIR /root
+
+COPY . .
+
+RUN make
+
+FROM alpine
+
+COPY --from=builder /root/bin/http /http
+
+ENTRYPOINT ["/http"]

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	internal.SetupLogging("client.log")
+	internal.SetupLogging()
 
 	client := &grpc.Client{}
 	err := client.Connect()
