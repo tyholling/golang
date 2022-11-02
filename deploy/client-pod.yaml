@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  name: client
-spec:
-  containers:
-  - name: client
-    image: localhost:5000/client
-    imagePullPolicy: Always
