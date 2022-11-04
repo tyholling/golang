@@ -12,12 +12,22 @@ import (
 func main() {
 	internal.SetupLogging()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {})
+	http.HandleFunc("/", handle)
 
 	server := http.Server{
 		ReadTimeout: time.Minute,
 	}
 	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func handle(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+
+	data := []byte("hello world\n")
+	_, err := w.Write(data)
 	if err != nil {
 		log.Fatal(err)
 	}
