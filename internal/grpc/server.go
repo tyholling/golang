@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Server represents the grpc server
@@ -63,6 +62,17 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		handleRecv(stream, msgChan)
 	}()
 
+	// subscribe to heartbeat
+	request, err := anypb.New(&pb.Subscribe{
+		Type: pb.SubscriptionType_HEARTBEAT,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	msgChan <- &pb.ConnectResponse{
+		Request: request,
+	}
+
 	wg.Wait()
 	return nil
 }
@@ -87,29 +97,19 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 		}
 
 		if msg.Request != nil {
-			log.Debugf("received request: %s", msg)
-
 			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
 			if err != nil {
 				log.Error(err)
 				continue
 			}
-			if _, ok := request.(*pb.PingRequest); ok {
-				request, err := anypb.New(&pb.PingRequest{
-					Timestamp: timestamppb.Now(),
-				})
-				if err != nil {
-					log.Error(err)
-					continue
-				}
-
-				msg := &pb.ConnectResponse{
-					Request: request,
-				}
-				msgChan <- msg
-			}
+			log.Debugf("received request: %s", request)
 		} else if msg.Response != nil {
-			log.Debugf("received response: %s", msg)
+			response, err := anypb.UnmarshalNew(msg.Response, proto.UnmarshalOptions{})
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			log.Debugf("received response: %s", response)
 		}
 	}
 }

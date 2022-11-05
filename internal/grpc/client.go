@@ -60,9 +60,6 @@ func (c *Client) Start() {
 		c.handleRecv(msgChan)
 	}()
 
-	// send ping request to start the loop
-	msgChan <- newPingRequest()
-
 	wg.Wait()
 }
 
@@ -83,7 +80,6 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 		if err != nil {
 			log.Errorf("failed to receive: %s", err)
 			c.reconnect()
-			msgChan <- newPingRequest()
 			continue
 		}
 
@@ -95,17 +91,27 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 				log.Error(err)
 				continue
 			}
-			if _, ok := request.(*pb.PingRequest); ok {
-				request, err := anypb.New(&pb.PingRequest{
-					Timestamp: timestamppb.Now(),
-				})
-				if err != nil {
-					log.Fatal(err)
+			if v, ok := request.(*pb.Subscribe); ok {
+				if v.Type == pb.SubscriptionType_HEARTBEAT {
+					go func() {
+						ticker := time.NewTicker(time.Second)
+						for {
+							<-ticker.C
+
+							response, err := anypb.New(&pb.Heartbeat{
+								Timestamp: timestamppb.Now(),
+							})
+							if err != nil {
+								log.Error(err)
+								continue
+							}
+							msg := &pb.ConnectRequest{
+								Response: response,
+							}
+							msgChan <- msg
+						}
+					}()
 				}
-				msg := &pb.ConnectRequest{
-					Request: request,
-				}
-				msgChan <- msg
 			}
 		} else if msg.Response != nil {
 			log.Debugf("received response: %s", msg)
@@ -123,17 +129,4 @@ func (c *Client) reconnect() {
 		}
 		time.Sleep(time.Second)
 	}
-}
-
-func newPingRequest() *pb.ConnectRequest {
-	request, err := anypb.New(&pb.PingRequest{
-		Timestamp: timestamppb.Now(),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	msg := &pb.ConnectRequest{
-		Request: request,
-	}
-	return msg
 }

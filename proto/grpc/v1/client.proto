@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto.grpc.v1;
+
+option go_package = "github.com/tyholling/golang/proto/grpc";
+
+enum SubscriptionType {
+  HEARTBEAT = 0;
+}
+
+message Subscribe {
+  SubscriptionType type = 1;
+}
+
+message Unsubscribe {
+  SubscriptionType type = 1;
+}
