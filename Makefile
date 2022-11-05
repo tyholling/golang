@@ -48,3 +48,6 @@ images:
 	podman push localhost:5000/server
 	podman build -t localhost:5000/http -f docker/http .
 	podman push localhost:5000/http
+
+builder:
+	podman build -t builder -f docker/builder .
