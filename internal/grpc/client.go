@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/shirou/gopsutil/v3/cpu"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
@@ -92,7 +93,8 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 				continue
 			}
 			if v, ok := request.(*pb.Subscribe); ok {
-				if v.Type == pb.SubscriptionType_HEARTBEAT {
+				switch v.Type {
+				case pb.SubscriptionType_HEARTBEAT:
 					go func() {
 						ticker := time.NewTicker(time.Second)
 						for {
@@ -100,6 +102,35 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 
 							response, err := anypb.New(&pb.Heartbeat{
 								Timestamp: timestamppb.Now(),
+							})
+							if err != nil {
+								log.Error(err)
+								continue
+							}
+							msg := &pb.ConnectRequest{
+								Response: response,
+							}
+							msgChan <- msg
+						}
+					}()
+				case pb.SubscriptionType_CPU:
+					go func() {
+						ticker := time.NewTicker(time.Second)
+						for {
+							<-ticker.C
+
+							pz, err := cpu.Percent(time.Minute, false)
+							if err != nil {
+								log.Error(err)
+								continue
+							}
+							if len(pz) == 0 {
+								log.Error("failed to retrieve CPU utilization")
+								continue
+							}
+
+							response, err := anypb.New(&pb.MetricsCPU{
+								Percent: pz[0],
 							})
 							if err != nil {
 								log.Error(err)

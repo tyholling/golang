@@ -9,3 +9,7 @@ option go_package = "github.com/tyholling/golang/proto/grpc";
 message Heartbeat {
   google.protobuf.Timestamp timestamp = 1;
 }
+
+message MetricsCPU {
+  double percent = 1;
+}

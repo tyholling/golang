@@ -63,14 +63,25 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 	}()
 
 	// subscribe to heartbeat
-	request, err := anypb.New(&pb.Subscribe{
+	request1, err := anypb.New(&pb.Subscribe{
 		Type: pb.SubscriptionType_HEARTBEAT,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	msgChan <- &pb.ConnectResponse{
-		Request: request,
+		Request: request1,
+	}
+
+	// subscribe to cpu
+	request2, err := anypb.New(&pb.Subscribe{
+		Type: pb.SubscriptionType_CPU,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	msgChan <- &pb.ConnectResponse{
+		Request: request2,
 	}
 
 	wg.Wait()
