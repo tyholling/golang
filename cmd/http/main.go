@@ -26,7 +26,7 @@ func main() {
 func handle(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
-	data := []byte("hello world\n")
+	data := []byte("\n")
 	_, err := w.Write(data)
 	if err != nil {
 		log.Fatal(err)
