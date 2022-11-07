@@ -6,7 +6,7 @@ option go_package = "github.com/tyholling/golang/proto/grpc";
 
 enum SubscriptionType {
   HEARTBEAT = 0;
-  CPU = 1;
+  METRICS = 1;
 }
 
 message Subscribe {

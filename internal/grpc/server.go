@@ -75,7 +75,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 
 	// subscribe to cpu
 	request2, err := anypb.New(&pb.Subscribe{
-		Type: pb.SubscriptionType_CPU,
+		Type: pb.SubscriptionType_METRICS,
 	})
 	if err != nil {
 		log.Fatal(err)

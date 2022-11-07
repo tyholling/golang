@@ -10,6 +10,13 @@ message Heartbeat {
   google.protobuf.Timestamp timestamp = 1;
 }
 
-message MetricsCPU {
-  double percent = 1;
+message Metrics {
+  double cpu = 1;
+  double memory = 2;
+  uint64 bytes_sent = 3;
+  uint64 bytes_received = 4;
+  uint64 errors_in = 5;
+  uint64 errors_out = 6;
+  uint64 discards_in = 7;
+  uint64 discards_out = 8;
 }

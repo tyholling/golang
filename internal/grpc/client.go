@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
@@ -96,10 +98,8 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 				switch v.Type {
 				case pb.SubscriptionType_HEARTBEAT:
 					go func() {
-						ticker := time.NewTicker(time.Second)
+						ticker := time.NewTicker(time.Minute)
 						for {
-							<-ticker.C
-
 							response, err := anypb.New(&pb.Heartbeat{
 								Timestamp: timestamppb.Now(),
 							})
@@ -111,15 +111,17 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 								Response: response,
 							}
 							msgChan <- msg
+
+							<-ticker.C
 						}
 					}()
-				case pb.SubscriptionType_CPU:
+				case pb.SubscriptionType_METRICS:
 					go func() {
-						ticker := time.NewTicker(time.Second)
+						ticker := time.NewTicker(time.Second * 10)
 						for {
-							<-ticker.C
+							metrics := &pb.Metrics{}
 
-							pz, err := cpu.Percent(time.Minute, false)
+							pz, err := cpu.Percent(time.Second, false)
 							if err != nil {
 								log.Error(err)
 								continue
@@ -128,10 +130,37 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 								log.Error("failed to retrieve CPU utilization")
 								continue
 							}
+							metrics.Cpu = pz[0]
 
-							response, err := anypb.New(&pb.MetricsCPU{
-								Percent: pz[0],
-							})
+							mz, err := mem.VirtualMemory()
+							if err != nil {
+								log.Error(err)
+								continue
+							}
+							if mz == nil {
+								log.Error("failed to retrieve memory utilization")
+								continue
+							}
+							metrics.Memory = mz.UsedPercent
+
+							izz, err := net.IOCounters(false)
+							if err != nil {
+								log.Error(err)
+								continue
+							}
+							if len(izz) == 0 {
+								log.Error("failed to retrieve network metrics")
+								continue
+							}
+							iz := izz[0]
+							metrics.BytesSent = iz.BytesSent
+							metrics.BytesReceived = iz.BytesRecv
+							metrics.ErrorsIn = iz.Errin
+							metrics.ErrorsOut = iz.Errout
+							metrics.DiscardsIn = iz.Dropin
+							metrics.DiscardsOut = iz.Dropout
+
+							response, err := anypb.New(metrics)
 							if err != nil {
 								log.Error(err)
 								continue
@@ -140,6 +169,8 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 								Response: response,
 							}
 							msgChan <- msg
+
+							<-ticker.C
 						}
 					}()
 				}
