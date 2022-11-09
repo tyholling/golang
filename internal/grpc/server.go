@@ -6,12 +6,37 @@ import (
 	"net"
 	"sync"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
+
+// Metrics stores metrics for prometheus
+type Metrics struct {
+	cpu         prometheus.Gauge
+	memory      prometheus.Gauge
+	bytesIn     prometheus.Gauge
+	bytesOut    prometheus.Gauge
+	errorsIn    prometheus.Gauge
+	errorsOut   prometheus.Gauge
+	discardsIn  prometheus.Gauge
+	discardsOut prometheus.Gauge
+}
+
+var metrics = Metrics{
+	cpu:         promauto.NewGauge(prometheus.GaugeOpts{Name: "cpu_utilization"}),
+	memory:      promauto.NewGauge(prometheus.GaugeOpts{Name: "memory_utilization"}),
+	bytesIn:     promauto.NewGauge(prometheus.GaugeOpts{Name: "bytes_in"}),
+	bytesOut:    promauto.NewGauge(prometheus.GaugeOpts{Name: "bytes_out"}),
+	errorsIn:    promauto.NewGauge(prometheus.GaugeOpts{Name: "errors_in"}),
+	errorsOut:   promauto.NewGauge(prometheus.GaugeOpts{Name: "errors_out"}),
+	discardsIn:  promauto.NewGauge(prometheus.GaugeOpts{Name: "discards_in"}),
+	discardsOut: promauto.NewGauge(prometheus.GaugeOpts{Name: "discards_out"}),
+}
 
 // Server represents the grpc server
 type Server struct {
@@ -119,6 +144,16 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 			if err != nil {
 				log.Error(err)
 				continue
+			}
+			if v, ok := response.(*pb.Metrics); ok {
+				metrics.cpu.Set(v.Cpu)
+				metrics.memory.Set(v.Memory)
+				metrics.bytesIn.Set(float64(v.BytesReceived))
+				metrics.bytesOut.Set(float64(v.BytesSent))
+				metrics.errorsIn.Set(float64(v.ErrorsIn))
+				metrics.errorsOut.Set(float64(v.ErrorsOut))
+				metrics.discardsIn.Set(float64(v.DiscardsIn))
+				metrics.discardsOut.Set(float64(v.DiscardsOut))
 			}
 			log.Debugf("received response: %s", response)
 		}
