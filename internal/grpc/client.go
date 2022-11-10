@@ -97,87 +97,89 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 			if v, ok := request.(*pb.Subscribe); ok {
 				switch v.Type {
 				case pb.SubscriptionType_HEARTBEAT:
-					go func() {
-						ticker := time.NewTicker(time.Minute)
-						for {
-							response, err := anypb.New(&pb.Heartbeat{
-								Timestamp: timestamppb.Now(),
-							})
-							if err != nil {
-								log.Error(err)
-								continue
-							}
-							msg := &pb.ConnectRequest{
-								Response: response,
-							}
-							msgChan <- msg
-
-							<-ticker.C
-						}
-					}()
+					go handleHeartbeat(msgChan)
 				case pb.SubscriptionType_METRICS:
-					go func() {
-						ticker := time.NewTicker(time.Second * 10)
-						for {
-							metrics := &pb.Metrics{}
-
-							pz, err := cpu.Percent(time.Second, false)
-							if err != nil {
-								log.Error(err)
-								continue
-							}
-							if len(pz) == 0 {
-								log.Error("failed to retrieve CPU utilization")
-								continue
-							}
-							metrics.Cpu = pz[0]
-
-							mz, err := mem.VirtualMemory()
-							if err != nil {
-								log.Error(err)
-								continue
-							}
-							if mz == nil {
-								log.Error("failed to retrieve memory utilization")
-								continue
-							}
-							metrics.Memory = mz.UsedPercent
-
-							izz, err := net.IOCounters(false)
-							if err != nil {
-								log.Error(err)
-								continue
-							}
-							if len(izz) == 0 {
-								log.Error("failed to retrieve network metrics")
-								continue
-							}
-							iz := izz[0]
-							metrics.BytesSent = iz.BytesSent
-							metrics.BytesReceived = iz.BytesRecv
-							metrics.ErrorsIn = iz.Errin
-							metrics.ErrorsOut = iz.Errout
-							metrics.DiscardsIn = iz.Dropin
-							metrics.DiscardsOut = iz.Dropout
-
-							response, err := anypb.New(metrics)
-							if err != nil {
-								log.Error(err)
-								continue
-							}
-							msg := &pb.ConnectRequest{
-								Response: response,
-							}
-							msgChan <- msg
-
-							<-ticker.C
-						}
-					}()
+					go handleMetrics(msgChan)
 				}
 			}
 		} else if msg.Response != nil {
 			log.Debugf("received response: %s", msg)
 		}
+	}
+}
+
+func handleHeartbeat(msgChan chan<- *pb.ConnectRequest) {
+	ticker := time.NewTicker(time.Minute)
+	for {
+		response, err := anypb.New(&pb.Heartbeat{
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		msgChan <- &pb.ConnectRequest{
+			Response: response,
+		}
+
+		<-ticker.C
+	}
+}
+
+func handleMetrics(msgChan chan<- *pb.ConnectRequest) {
+	ticker := time.NewTicker(time.Second * 10)
+	for {
+		metrics := &pb.Metrics{}
+
+		pz, err := cpu.Percent(time.Second, false)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		if len(pz) == 0 {
+			log.Error("failed to retrieve CPU utilization")
+			continue
+		}
+		metrics.Cpu = pz[0]
+
+		mz, err := mem.VirtualMemory()
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		if mz == nil {
+			log.Error("failed to retrieve memory utilization")
+			continue
+		}
+		metrics.Memory = mz.UsedPercent
+
+		izz, err := net.IOCounters(false)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		if len(izz) == 0 {
+			log.Error("failed to retrieve network metrics")
+			continue
+		}
+		iz := izz[0]
+		metrics.BytesSent = iz.BytesSent
+		metrics.BytesReceived = iz.BytesRecv
+		metrics.ErrorsIn = iz.Errin
+		metrics.ErrorsOut = iz.Errout
+		metrics.DiscardsIn = iz.Dropin
+		metrics.DiscardsOut = iz.Dropout
+
+		response, err := anypb.New(metrics)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		msgChan <- &pb.ConnectRequest{
+			Response: response,
+		}
+
+		<-ticker.C
 	}
 }
 
