@@ -6,11 +6,11 @@ Example project to collect metrics from clients over gRPC.
 
 1. Requires: `go`, `gcc`, `make`
 
-1. `make build` to build
-
 1. `make setup` to install the checkers
 
 1. `make check` to run the checkers
+
+1. `make build` to build
 
 1. `make builder` to build the builder image
 
@@ -50,3 +50,13 @@ Example project to collect metrics from clients over gRPC.
 
 		kubectl apply -f server-deployment.yaml
 		kubectl apply -f server-service.yaml
+
+## Collect metrics
+
+1. `./bin/client &` to run the client
+
+1. Navigate to `/grafana` to login to grafana
+
+1. Add Prometheus as a data source: `http://localhost/prometheus`
+
+1. Add `client-metrics.json` as a grafana dashboard

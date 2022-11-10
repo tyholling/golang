@@ -10,6 +10,6 @@ import (
 // SetupLogging is used to setup logging
 func SetupLogging() {
 	log.SetFormatter(&log.JSONFormatter{})
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 	log.SetOutput(os.Stdout)
 }
