@@ -22,19 +22,19 @@ Example project to collect metrics from clients over gRPC.
 
 1. `cd deploy`
 
-1. Install `ingress-nginx`
+1. Install [`ingress-nginx`](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
 
 		kubectl create namespace ingress-nginx
 		helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 		helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx -f ingress-nginx-values.yaml
 
-1. Install `prometheus`
+1. Install [`prometheus`](https://artifacthub.io/packages/helm/prometheus-community/prometheus)
 
 		helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 		helm install prometheus prometheus-community/prometheus -f prometheus-values.yaml
 		kubectl apply -f prometheus-ingress.yaml
 
-1. Install `grafana`
+1. Install [`grafana`](https://artifacthub.io/packages/helm/grafana/grafana)
 
 		helm repo add grafana https://grafana.github.io/helm-charts
 		helm install grafana grafana/grafana -f grafana-values.yaml
