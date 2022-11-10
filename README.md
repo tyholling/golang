@@ -31,7 +31,7 @@ Example project to collect metrics from clients over gRPC.
 1. Install `prometheus`
 
 		helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-		helm install prometheus prometheus-common/prometheus -f prometheus-values.yaml
+		helm install prometheus prometheus-community/prometheus -f prometheus-values.yaml
 		kubectl apply -f prometheus-ingress.yaml
 
 1. Install `grafana`
@@ -57,6 +57,8 @@ Example project to collect metrics from clients over gRPC.
 
 1. Navigate to `/grafana` to login to grafana
 
-1. Add Prometheus as a data source: `http://localhost/prometheus`
+1. Add Prometheus as a data source: `http://prometheus-server/prometheus` with scrape interval set to `10s`
+
+1. `kubectl edit cm/prometheus-server` and add `server-http:8080` as a target
 
 1. Add `client-metrics.json` as a grafana dashboard
