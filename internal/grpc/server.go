@@ -98,7 +98,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		Request: request1,
 	}
 
-	// subscribe to cpu
+	// subscribe to metrics
 	request2, err := anypb.New(&pb.Subscribe{
 		Type: pb.SubscriptionType_METRICS,
 	})
@@ -146,14 +146,30 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 				continue
 			}
 			if v, ok := response.(*pb.Metrics); ok {
-				metrics.cpu.Set(v.Cpu)
-				metrics.memory.Set(v.Memory)
-				metrics.bytesIn.Set(float64(v.BytesReceived))
-				metrics.bytesOut.Set(float64(v.BytesSent))
-				metrics.errorsIn.Set(float64(v.ErrorsIn))
-				metrics.errorsOut.Set(float64(v.ErrorsOut))
-				metrics.discardsIn.Set(float64(v.DiscardsIn))
-				metrics.discardsOut.Set(float64(v.DiscardsOut))
+				if v.Cpu != nil {
+					metrics.cpu.Set(*v.Cpu)
+				}
+				if v.Memory != nil {
+					metrics.memory.Set(*v.Memory)
+				}
+				if v.BytesReceived != nil {
+					metrics.bytesIn.Set(float64(*v.BytesReceived))
+				}
+				if v.BytesSent != nil {
+					metrics.bytesOut.Set(float64(*v.BytesSent))
+				}
+				if v.ErrorsIn != nil {
+					metrics.errorsIn.Set(float64(*v.ErrorsIn))
+				}
+				if v.ErrorsOut != nil {
+					metrics.errorsOut.Set(float64(*v.ErrorsOut))
+				}
+				if v.DiscardsIn != nil {
+					metrics.discardsIn.Set(float64(*v.DiscardsIn))
+				}
+				if v.DiscardsOut != nil {
+					metrics.discardsOut.Set(float64(*v.DiscardsOut))
+				}
 			}
 			log.Debugf("received response: %s", response)
 		}

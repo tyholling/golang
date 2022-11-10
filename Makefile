@@ -41,6 +41,7 @@ setup:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 	go install mvdan.cc/gofumpt@latest
 
+.PHONY: images
 images:
 	podman build -t localhost:5000/client -f docker/client .
 	podman build -t localhost:5000/server -f docker/server .
