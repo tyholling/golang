@@ -24,26 +24,26 @@ Example project to collect metrics from clients over gRPC.
 
 1. Install `ingress-nginx`
 
-    kubectl create namespace ingress-nginx
-    helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx -f ingress-nginx-values.yaml
+		kubectl create namespace ingress-nginx
+		helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx -f ingress-nginx-values.yaml
 
 1. Install `prometheus`
 
-    helm install prometheus prometheus-common/prometheus -f prometheus-values.yaml
-    kubectl apply -f prometheus-ingress.yaml
+		helm install prometheus prometheus-common/prometheus -f prometheus-values.yaml
+		kubectl apply -f prometheus-ingress.yaml
 
 1. Install `grafana`
 
-    helm install grafana grafana/grafana -f grafana-values.yaml
-    kubectl apply -f grafana-ingress.yaml
+		helm install grafana grafana/grafana -f grafana-values.yaml
+		kubectl apply -f grafana-ingress.yaml
 
 1. Deploy http service
 
-    kubectl apply -f http-deployment.yaml
-    kubectl apply -f http-service.yaml
-    kubectl apply -f http-ingress.yaml
+		kubectl apply -f http-deployment.yaml
+		kubectl apply -f http-service.yaml
+		kubectl apply -f http-ingress.yaml
 
 1. Deploy grpc service
 
-    kubectl apply -f server-deployment.yaml
-    kubectl apply -f server-service.yaml
+		kubectl apply -f server-deployment.yaml
+		kubectl apply -f server-service.yaml
