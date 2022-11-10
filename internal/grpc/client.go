@@ -128,9 +128,15 @@ func handleHeartbeat(msgChan chan<- *pb.ConnectRequest) {
 
 func handleMetrics(msgChan chan<- *pb.ConnectRequest) {
 	ticker := time.NewTicker(time.Second * 10)
-	for {
-		metrics := &pb.Metrics{}
+	metrics := &pb.Metrics{}
+	var bytesIn uint64
+	var bytesOut uint64
+	var errorsIn uint64
+	var errorsOut uint64
+	var discardsIn uint64
+	var discardsOut uint64
 
+	for {
 		pz, err := cpu.Percent(time.Second, false)
 		if err != nil {
 			log.Error(err)
@@ -140,8 +146,7 @@ func handleMetrics(msgChan chan<- *pb.ConnectRequest) {
 			log.Error("failed to retrieve CPU utilization")
 			continue
 		}
-		metrics.Cpu = new(float64)
-		*metrics.Cpu = pz[0]
+		metrics.Cpu = pz[0]
 
 		mz, err := mem.VirtualMemory()
 		if err != nil {
@@ -152,8 +157,7 @@ func handleMetrics(msgChan chan<- *pb.ConnectRequest) {
 			log.Error("failed to retrieve memory utilization")
 			continue
 		}
-		metrics.Memory = new(float64)
-		*metrics.Memory = mz.UsedPercent
+		metrics.Memory = mz.UsedPercent
 
 		izz, err := net.IOCounters(false)
 		if err != nil {
@@ -165,18 +169,19 @@ func handleMetrics(msgChan chan<- *pb.ConnectRequest) {
 			continue
 		}
 		iz := izz[0]
-		metrics.BytesSent = new(uint64)
-		*metrics.BytesSent = iz.BytesSent
-		metrics.BytesReceived = new(uint64)
-		*metrics.BytesReceived = iz.BytesRecv
-		metrics.ErrorsIn = new(uint64)
-		*metrics.ErrorsIn = iz.Errin
-		metrics.ErrorsOut = new(uint64)
-		*metrics.ErrorsOut = iz.Errout
-		metrics.DiscardsIn = new(uint64)
-		*metrics.DiscardsIn = iz.Dropin
-		metrics.DiscardsOut = new(uint64)
-		*metrics.DiscardsOut = iz.Dropout
+
+		metrics.BytesIn = iz.BytesRecv - bytesIn
+		bytesIn = iz.BytesRecv
+		metrics.BytesOut = iz.BytesSent - bytesOut
+		bytesOut = iz.BytesSent
+		metrics.ErrorsIn = iz.Errin - errorsIn
+		errorsIn = iz.Errin
+		metrics.ErrorsOut = iz.Errout - errorsOut
+		errorsOut = iz.Errout
+		metrics.DiscardsIn = iz.Dropin - discardsIn
+		discardsIn = iz.Dropin
+		metrics.DiscardsOut = iz.Dropout - discardsOut
+		discardsOut = iz.Dropout
 
 		response, err := anypb.New(metrics)
 		if err != nil {

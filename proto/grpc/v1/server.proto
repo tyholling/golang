@@ -11,12 +11,12 @@ message Heartbeat {
 }
 
 message Metrics {
-  optional double cpu = 1;
-  optional double memory = 2;
-  optional uint64 bytes_sent = 3;
-  optional uint64 bytes_received = 4;
-  optional uint64 errors_in = 5;
-  optional uint64 errors_out = 6;
-  optional uint64 discards_in = 7;
-  optional uint64 discards_out = 8;
+  double cpu = 1;
+  double memory = 2;
+  uint64 bytes_in = 3;
+  uint64 bytes_out = 4;
+  uint64 errors_in = 5;
+  uint64 errors_out = 6;
+  uint64 discards_in = 7;
+  uint64 discards_out = 8;
 }

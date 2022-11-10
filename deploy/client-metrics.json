@@ -101,6 +101,8 @@
             }
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -197,6 +199,8 @@
             }
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -306,7 +310,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "binBps"
         },
         "overrides": []
       },
@@ -338,7 +342,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "bytes_in{instance=\"server-http:8080\"}",
+          "expr": "rate(bytes_in{instance=\"server-http:8080\"}[$__range])",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -404,7 +408,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "binBps"
         },
         "overrides": []
       },
@@ -435,7 +439,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "bytes_out{instance=\"server-http:8080\"}",
+          "expr": "rate(bytes_out{instance=\"server-http:8080\"}[$__range])",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -499,7 +503,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "pps"
         },
         "overrides": []
       },
@@ -529,8 +534,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "builder",
-          "expr": "errors_in{instance=\"server-http:8080\"}",
+          "editorMode": "code",
+          "expr": "rate(errors_in{instance=\"server-http:8080\"}[$__range])",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -594,7 +599,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "pps"
         },
         "overrides": []
       },
@@ -624,8 +630,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "builder",
-          "expr": "errors_out{instance=\"server-http:8080\"}",
+          "editorMode": "code",
+          "expr": "rate(errors_out{instance=\"server-http:8080\"}[$__range])",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -690,7 +696,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "pps"
         },
         "overrides": []
       },
@@ -720,8 +727,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "builder",
-          "expr": "discards_in{instance=\"server-http:8080\"}",
+          "editorMode": "code",
+          "expr": "rate(discards_in{instance=\"server-http:8080\"}[$__range])",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -786,7 +793,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "pps"
         },
         "overrides": []
       },
@@ -816,8 +824,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "builder",
-          "expr": "discards_out{instance=\"server-http:8080\"}",
+          "editorMode": "code",
+          "expr": "rate(discards_out{instance=\"server-http:8080\"}[$__range])",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -843,6 +851,6 @@
   "timezone": "",
   "title": "Client Metrics",
   "uid": "MOB2a1vVz",
-  "version": 8,
+  "version": 11,
   "weekStart": ""
 }

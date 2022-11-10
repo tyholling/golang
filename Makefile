@@ -1,4 +1,4 @@
-build:
+build: buf
 	go build -o bin/ ./...
 
 align:
@@ -28,7 +28,7 @@ tidy:
 vet:
 	go vet ./...
 
-check: align buf critic format revive secure staticcheck tidy vet
+check: align critic format revive secure staticcheck tidy vet
 
 setup:
 	go install github.com/bufbuild/buf/cmd/buf@latest

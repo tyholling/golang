@@ -19,23 +19,23 @@ import (
 type Metrics struct {
 	cpu         prometheus.Gauge
 	memory      prometheus.Gauge
-	bytesIn     prometheus.Gauge
-	bytesOut    prometheus.Gauge
-	errorsIn    prometheus.Gauge
-	errorsOut   prometheus.Gauge
-	discardsIn  prometheus.Gauge
-	discardsOut prometheus.Gauge
+	bytesIn     prometheus.Counter
+	bytesOut    prometheus.Counter
+	errorsIn    prometheus.Counter
+	errorsOut   prometheus.Counter
+	discardsIn  prometheus.Counter
+	discardsOut prometheus.Counter
 }
 
 var metrics = Metrics{
 	cpu:         promauto.NewGauge(prometheus.GaugeOpts{Name: "cpu_utilization"}),
 	memory:      promauto.NewGauge(prometheus.GaugeOpts{Name: "memory_utilization"}),
-	bytesIn:     promauto.NewGauge(prometheus.GaugeOpts{Name: "bytes_in"}),
-	bytesOut:    promauto.NewGauge(prometheus.GaugeOpts{Name: "bytes_out"}),
-	errorsIn:    promauto.NewGauge(prometheus.GaugeOpts{Name: "errors_in"}),
-	errorsOut:   promauto.NewGauge(prometheus.GaugeOpts{Name: "errors_out"}),
-	discardsIn:  promauto.NewGauge(prometheus.GaugeOpts{Name: "discards_in"}),
-	discardsOut: promauto.NewGauge(prometheus.GaugeOpts{Name: "discards_out"}),
+	bytesIn:     promauto.NewCounter(prometheus.CounterOpts{Name: "bytes_in"}),
+	bytesOut:    promauto.NewCounter(prometheus.CounterOpts{Name: "bytes_out"}),
+	errorsIn:    promauto.NewCounter(prometheus.CounterOpts{Name: "errors_in"}),
+	errorsOut:   promauto.NewCounter(prometheus.CounterOpts{Name: "errors_out"}),
+	discardsIn:  promauto.NewCounter(prometheus.CounterOpts{Name: "discards_in"}),
+	discardsOut: promauto.NewCounter(prometheus.CounterOpts{Name: "discards_out"}),
 }
 
 // Server represents the grpc server
@@ -146,30 +146,15 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.Co
 				continue
 			}
 			if v, ok := response.(*pb.Metrics); ok {
-				if v.Cpu != nil {
-					metrics.cpu.Set(*v.Cpu)
-				}
-				if v.Memory != nil {
-					metrics.memory.Set(*v.Memory)
-				}
-				if v.BytesReceived != nil {
-					metrics.bytesIn.Set(float64(*v.BytesReceived))
-				}
-				if v.BytesSent != nil {
-					metrics.bytesOut.Set(float64(*v.BytesSent))
-				}
-				if v.ErrorsIn != nil {
-					metrics.errorsIn.Set(float64(*v.ErrorsIn))
-				}
-				if v.ErrorsOut != nil {
-					metrics.errorsOut.Set(float64(*v.ErrorsOut))
-				}
-				if v.DiscardsIn != nil {
-					metrics.discardsIn.Set(float64(*v.DiscardsIn))
-				}
-				if v.DiscardsOut != nil {
-					metrics.discardsOut.Set(float64(*v.DiscardsOut))
-				}
+				metrics.cpu.Set(v.Cpu)
+				metrics.memory.Set(v.Memory)
+
+				metrics.bytesIn.Add(float64(v.BytesIn))
+				metrics.bytesOut.Add(float64(v.BytesOut))
+				metrics.errorsIn.Add(float64(v.ErrorsIn))
+				metrics.errorsOut.Add(float64(v.ErrorsOut))
+				metrics.discardsIn.Add(float64(v.DiscardsIn))
+				metrics.discardsOut.Add(float64(v.DiscardsOut))
 			}
 			log.Debugf("received response: %s", response)
 		}
