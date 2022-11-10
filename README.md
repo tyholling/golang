@@ -62,3 +62,7 @@ Example project to collect metrics from clients over gRPC.
 1. `kubectl edit cm/prometheus-server` and add `server-http:8080` as a target
 
 1. Add `client-metrics.json` as a grafana dashboard
+
+Example Client Metrics dashboard:
+
+![client-metrics dashboard](images/dashboard.png)
