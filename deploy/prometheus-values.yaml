@@ -1,3 +1,11 @@
 server:
   baseURL: http://localhost:9090/prometheus
   prefixURL: /prometheus
+
+serverFiles:
+  prometheus.yml:
+    scrape_configs:
+    - job_name: prometheus
+      static_configs:
+      - targets:
+        - server-http:8080
