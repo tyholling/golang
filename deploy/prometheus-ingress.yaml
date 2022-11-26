@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: prometheus
 spec:
+  ingressClassName: nginx
   rules:
   - http:
       paths:
