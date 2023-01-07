@@ -4,7 +4,7 @@ Example project to collect metrics from clients over gRPC.
 
 ## Build
 
-1. Requires: `go`, `gcc`, `make`
+1. Requires: `go`, `gcc`, `make`, `podman`
 
 1. `make setup` to install the build tools
 
