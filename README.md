@@ -16,8 +16,6 @@ Example project to collect metrics from clients over gRPC.
 
 1. `make images` to build the images
 
-1. `make push` to push the images to a localhost:5000 registry
-
 ## Deploy
 
 1. `cd deploy`
