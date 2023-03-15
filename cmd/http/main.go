@@ -23,7 +23,7 @@ func main() {
 	}
 }
 
-func handle(w http.ResponseWriter, r *http.Request) {
+func handle(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	data := []byte("\n")

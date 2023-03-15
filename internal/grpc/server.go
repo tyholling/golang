@@ -124,7 +124,7 @@ func handleSend(stream pb.ConnectionService_ConnectServer, msgChan <-chan *pb.Co
 	}
 }
 
-func handleRecv(stream pb.ConnectionService_ConnectServer, msgChan chan<- *pb.ConnectResponse) {
+func handleRecv(stream pb.ConnectionService_ConnectServer, _ chan<- *pb.ConnectResponse) {
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
