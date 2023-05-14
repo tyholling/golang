@@ -21,11 +21,17 @@ errcheck:
 format:
 	gofumpt -w -extra .
 
+nilness:
+	nilness ./...
+
 revive:
 	revive -formatter stylish ./...
 
 secure:
 	gosec -quiet ./...
+
+shadow:
+	shadow ./...
 
 staticcheck:
 	staticcheck -show-ignored ./...
@@ -36,7 +42,7 @@ tidy:
 vet:
 	go vet ./...
 
-check: align ascii critic errcheck format revive secure staticcheck tidy vet
+check: align ascii critic errcheck format nilness revive secure shadow staticcheck tidy vet
 
 setup:
 	go install github.com/bufbuild/buf/cmd/buf@latest
@@ -46,6 +52,8 @@ setup:
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
 	go install github.com/tdakkota/asciicheck/cmd/asciicheck@latest
 	go install golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@latest
+	go install golang.org/x/tools/go/analysis/passes/nilness/cmd/nilness@latest
+	go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
