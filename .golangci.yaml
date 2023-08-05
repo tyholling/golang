@@ -7,7 +7,6 @@ linters:
   - gochecknoglobals
   - godot
   - nlreturn
-  - promlinter
   - varnamelen
   - wsl
 

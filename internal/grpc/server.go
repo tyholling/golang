@@ -28,14 +28,22 @@ type Metrics struct {
 }
 
 var metrics = Metrics{
-	cpu:         promauto.NewGauge(prometheus.GaugeOpts{Name: "cpu_utilization"}),
-	memory:      promauto.NewGauge(prometheus.GaugeOpts{Name: "memory_utilization"}),
-	bytesIn:     promauto.NewCounter(prometheus.CounterOpts{Name: "bytes_in"}),
-	bytesOut:    promauto.NewCounter(prometheus.CounterOpts{Name: "bytes_out"}),
-	errorsIn:    promauto.NewCounter(prometheus.CounterOpts{Name: "errors_in"}),
-	errorsOut:   promauto.NewCounter(prometheus.CounterOpts{Name: "errors_out"}),
-	discardsIn:  promauto.NewCounter(prometheus.CounterOpts{Name: "discards_in"}),
-	discardsOut: promauto.NewCounter(prometheus.CounterOpts{Name: "discards_out"}),
+	cpu: promauto.NewGauge(
+		prometheus.GaugeOpts{Name: "cpu_utilization", Help: "cpu utilization"}),
+	memory: promauto.NewGauge(
+		prometheus.GaugeOpts{Name: "memory_utilization", Help: "memory utilization"}),
+	bytesIn: promauto.NewCounter(
+		prometheus.CounterOpts{Name: "bytes_in_total", Help: "bytes in total"}),
+	bytesOut: promauto.NewCounter(
+		prometheus.CounterOpts{Name: "bytes_out_total", Help: "bytes out total"}),
+	errorsIn: promauto.NewCounter(
+		prometheus.CounterOpts{Name: "errors_in_total", Help: "errors in total"}),
+	errorsOut: promauto.NewCounter(
+		prometheus.CounterOpts{Name: "errors_out_total", Help: "errors out total"}),
+	discardsIn: promauto.NewCounter(
+		prometheus.CounterOpts{Name: "discards_in_total", Help: "discards in total"}),
+	discardsOut: promauto.NewCounter(
+		prometheus.CounterOpts{Name: "discards_out_total", Help: "discards out total"}),
 }
 
 // Server represents the grpc server
