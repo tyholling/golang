@@ -6,7 +6,6 @@ linters:
   - funlen
   - gochecknoglobals
   - godot
-  - goerr113
   - gomnd
   - nlreturn
   - promlinter
