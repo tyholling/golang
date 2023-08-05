@@ -1,5 +1,3 @@
-.PHONY: images
-
 build: buf
 	go build -o bin/ ./...
 
