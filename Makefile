@@ -72,4 +72,5 @@ push:
 	podman push localhost:5000/http
 
 builder:
-	podman build -t builder -f docker/builder .
+	podman build -t localhost:5000/builder -f docker/builder .
+	podman push localhost:5000/builder
