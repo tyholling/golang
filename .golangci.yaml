@@ -1,0 +1,27 @@
+linters:
+  enable-all: true
+  disable:
+  - depguard
+  - errorlint
+  - exhaustruct
+  - funlen
+  - gochecknoglobals
+  - godot
+  - goerr113
+  - gomnd
+  - nlreturn
+  - promlinter
+  - varnamelen
+  - wsl
+
+  # deprecated
+  - deadcode
+  - exhaustivestruct
+  - golint
+  - ifshort
+  - interfacer
+  - maligned
+  - nosnakecase
+  - scopelint
+  - structcheck
+  - varcheck

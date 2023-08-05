@@ -19,6 +19,9 @@ errcheck:
 format:
 	gofumpt -w -extra .
 
+lint:
+	golangci-lint run
+
 nilness:
 	nilness ./...
 
@@ -48,6 +51,7 @@ check: align ascii critic errcheck format nilness revive secure shadow staticche
 setup:
 	go install github.com/bufbuild/buf/cmd/buf@latest
 	go install github.com/go-critic/go-critic/cmd/gocritic@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install github.com/kisielk/errcheck@latest
 	go install github.com/mgechev/revive@latest
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
