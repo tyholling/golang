@@ -40,6 +40,9 @@ tidy:
 vet:
 	go vet ./...
 
+vuln:
+	govulncheck ./...
+
 check: align ascii critic errcheck format nilness revive secure shadow staticcheck tidy vet
 
 setup:
@@ -52,6 +55,7 @@ setup:
 	go install golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@latest
 	go install golang.org/x/tools/go/analysis/passes/nilness/cmd/nilness@latest
 	go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+	go install golang.org/x/vuln/cmd/govulncheck@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
