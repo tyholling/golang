@@ -19,14 +19,14 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// Client represents the grpc client
+// Client represents the grpc client.
 type Client struct {
 	conn   *grpc.ClientConn
 	client pb.ConnectionServiceClient
 	stream pb.ConnectionService_ConnectClient
 }
 
-// Connect creates the grpc connection
+// Connect creates the grpc connection.
 func (c *Client) Connect() error {
 	target := "localhost:65000"
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
@@ -46,7 +46,7 @@ func (c *Client) Connect() error {
 	return nil
 }
 
-// Start runs the handlers to send and receive grpc messages
+// Start runs the handlers to send and receive grpc messages.
 func (c *Client) Start() {
 	wg := sync.WaitGroup{}
 	msgChan := make(chan *pb.ConnectRequest)

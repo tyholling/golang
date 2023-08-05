@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-// Metrics stores metrics for prometheus
+// Metrics stores metrics for prometheus.
 type Metrics struct {
 	cpu         prometheus.Gauge
 	memory      prometheus.Gauge
@@ -27,13 +27,13 @@ type Metrics struct {
 	discardsOut prometheus.Counter
 }
 
-// Server represents the grpc server
+// Server represents the grpc server.
 type Server struct {
 	conn   net.Listener
 	server *grpc.Server
 }
 
-// Listen listens for new grpc connections
+// Listen listens for new grpc connections.
 func (s *Server) Listen() error {
 	conn, err := net.Listen("tcp", "0.0.0.0:65000") // #nosec G102
 	if err != nil {
@@ -44,7 +44,7 @@ func (s *Server) Listen() error {
 	return nil
 }
 
-// Start accepts incoming grpc connections
+// Start accepts incoming grpc connections.
 func (s *Server) Start() {
 	s.server = grpc.NewServer()
 	pb.RegisterConnectionServiceServer(s.server, &connectionServer{})
@@ -59,7 +59,7 @@ type connectionServer struct {
 	pb.UnimplementedConnectionServiceServer
 }
 
-// Connect runs the handlers to send and receive grpc messages
+// Connect runs the handlers to send and receive grpc messages.
 func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) error {
 	wg := sync.WaitGroup{}
 	msgChan := make(chan *pb.ConnectResponse)

@@ -4,7 +4,6 @@ linters:
   - depguard
   - exhaustruct
   - funlen
-  - godot
   - nlreturn
   - varnamelen
   - wsl
