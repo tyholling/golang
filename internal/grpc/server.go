@@ -48,7 +48,7 @@ type Server struct {
 func (s *Server) Listen() error {
 	conn, err := net.Listen("tcp", "0.0.0.0:65000") // #nosec G102
 	if err != nil {
-		return fmt.Errorf("failed to listen: %s", err)
+		return fmt.Errorf("failed to listen: %w", err)
 	}
 	s.conn = conn
 

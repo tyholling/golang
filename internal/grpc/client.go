@@ -32,14 +32,14 @@ func (c *Client) Connect() error {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
-		return fmt.Errorf("failed to connect to channel: %s", err)
+		return fmt.Errorf("failed to connect to channel: %w", err)
 	}
 	c.conn = conn
 
 	c.client = pb.NewConnectionServiceClient(c.conn)
 	stream, err := c.client.Connect(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to connect to server: %s", err)
+		return fmt.Errorf("failed to connect to server: %w", err)
 	}
 	c.stream = stream
 

@@ -2,7 +2,6 @@ linters:
   enable-all: true
   disable:
   - depguard
-  - errorlint
   - exhaustruct
   - funlen
   - gochecknoglobals
