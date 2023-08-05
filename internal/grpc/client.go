@@ -127,7 +127,7 @@ func handleHeartbeat(msgChan chan<- *pb.ConnectRequest) {
 }
 
 func handleMetrics(msgChan chan<- *pb.ConnectRequest) {
-	ticker := time.NewTicker(time.Second * 10)
+	ticker := time.NewTicker(time.Second)
 	metrics := &pb.Metrics{}
 	var bytesIn uint64
 	var bytesOut uint64
