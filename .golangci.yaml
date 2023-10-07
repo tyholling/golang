@@ -1,0 +1,26 @@
+linters:
+  enable-all: true
+  disable:
+  - exhaustruct
+  - wsl
+
+  # deprecated
+  - deadcode
+  - exhaustivestruct
+  - golint
+  - ifshort
+  - interfacer
+  - maligned
+  - nosnakecase
+  - scopelint
+  - structcheck
+  - varcheck
+
+linters-settings:
+  gocritic:
+    enabled-tags:
+    - diagnostic
+    - experimental
+    - opinionated
+    - performance
+    - style

@@ -1,4 +1,4 @@
-build:
+build: tidy
 	go build -o bin/ ./...
 
 format:
@@ -13,7 +13,7 @@ tidy:
 vuln:
 	govulncheck ./...
 
-check: format tidy lint
+check: format lint
 
 setup:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
