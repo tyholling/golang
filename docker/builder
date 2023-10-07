@@ -1,9 +1,0 @@
-FROM docker.io/library/golang:alpine
-
-WORKDIR /root
-
-COPY . .
-
-RUN apk add make \
-&&  make setup \
-&&  go mod download
