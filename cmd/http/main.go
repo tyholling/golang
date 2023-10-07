@@ -14,7 +14,7 @@ func main() {
 	}
 	err := server.ListenAndServe()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 }
 
@@ -24,6 +24,6 @@ func handle(w http.ResponseWriter, _ *http.Request) {
 	data := []byte("\n")
 	_, err := w.Write(data)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 }

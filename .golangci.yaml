@@ -24,3 +24,8 @@ linters-settings:
     - opinionated
     - performance
     - style
+  gofumpt:
+    extra-rules: true
+  govet:
+    check-shadowing: true
+    enable-all: true
