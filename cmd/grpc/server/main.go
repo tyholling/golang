@@ -55,6 +55,16 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		handleRecv(stream, messages)
 	}()
 
+	request, err := anypb.New(&pb.Subscribe{
+		Type: pb.Subscription_SUBSCRIPTION_HEARTBEAT,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	messages <- &pb.ConnectResponse{
+		Request: request,
+	}
+
 	wg.Wait()
 	return nil
 }

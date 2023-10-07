@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Client struct {
@@ -70,7 +71,7 @@ func (c *Client) handleSend(messages <-chan *pb.ConnectRequest) {
 	}
 }
 
-func (c *Client) handleRecv(_ chan<- *pb.ConnectRequest) {
+func (c *Client) handleRecv(messages chan<- *pb.ConnectRequest) {
 	for {
 		msg, err := c.stream.Recv()
 		if err != nil {
@@ -85,6 +86,14 @@ func (c *Client) handleRecv(_ chan<- *pb.ConnectRequest) {
 				log.Print(err)
 				continue
 			}
+			if v, ok := request.(*pb.Subscribe); ok {
+				switch v.Type {
+				case pb.Subscription_SUBSCRIPTION_HEARTBEAT:
+					go handleHeartbeat(messages)
+				case pb.Subscription_SUBSCRIPTION_UNSPECIFIED:
+					continue
+				}
+			}
 			log.Printf("received request: %s", request)
 		} else if msg.Response != nil {
 			response, err := anypb.UnmarshalNew(msg.Response, proto.UnmarshalOptions{})
@@ -94,6 +103,24 @@ func (c *Client) handleRecv(_ chan<- *pb.ConnectRequest) {
 			}
 			log.Printf("received response: %s", response)
 		}
+	}
+}
+
+func handleHeartbeat(messages chan<- *pb.ConnectRequest) {
+	ticker := time.NewTicker(time.Minute)
+	for {
+		response, err := anypb.New(&pb.Heartbeat{
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		messages <- &pb.ConnectRequest{
+			Response: response,
+		}
+
+		<-ticker.C
 	}
 }
 
@@ -115,4 +142,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	client.Start()
 }

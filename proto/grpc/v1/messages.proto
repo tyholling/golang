@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package proto.grpc.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/tyholling/golang/proto/grpc";
+
+enum Subscription {
+  SUBSCRIPTION_UNSPECIFIED = 0;
+  SUBSCRIPTION_HEARTBEAT = 1;
+}
+
+message Subscribe {
+  Subscription type = 1;
+}
+
+message Unsubscribe {
+  Subscription type = 1;
+}
+
+message Heartbeat {
+  google.protobuf.Timestamp timestamp = 1;
+}
