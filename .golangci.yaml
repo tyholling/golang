@@ -1,7 +1,10 @@
 linters:
   enable-all: true
   disable:
+  - depguard
   - exhaustruct
+  - nlreturn
+  - varnamelen
   - wsl
 
   # deprecated

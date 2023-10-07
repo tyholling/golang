@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto.grpc.v1;
+
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/tyholling/golang/proto/grpc";
+
+message ConnectRequest {
+  optional google.protobuf.Any request = 1;
+  optional google.protobuf.Any response = 2;
+}
+
+message ConnectResponse {
+  optional google.protobuf.Any request = 1;
+  optional google.protobuf.Any response = 2;
+}
+
+service ConnectionService {
+  rpc Connect(stream ConnectRequest) returns (stream ConnectResponse);
+}
