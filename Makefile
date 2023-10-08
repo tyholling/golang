@@ -1,7 +1,7 @@
-build: buf tidy
+build: protobuf tidy
 	go build -o bin/ ./...
 
-buf:
+protobuf:
 	buf lint
 	buf generate
 

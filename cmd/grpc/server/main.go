@@ -59,7 +59,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		Type: pb.Subscription_SUBSCRIPTION_HEARTBEAT,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	messages <- &pb.ConnectResponse{
 		Request: request,
@@ -73,7 +73,8 @@ func handleSend(stream pb.ConnectionService_ConnectServer, messages <-chan *pb.C
 	for msg := range messages {
 		err := stream.Send(msg)
 		if err != nil {
-			log.Fatalf("failed to send: %s", err)
+			log.Printf("failed to send: %s", err)
+			return
 		}
 		log.Printf("send: %s", msg)
 	}
@@ -83,7 +84,8 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, _ chan<- *pb.ConnectR
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
-			log.Fatalf("failed to receive: %s", err)
+			log.Printf("failed to receive: %s", err)
+			return
 		}
 
 		if msg.Request != nil {
