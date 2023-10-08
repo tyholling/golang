@@ -30,6 +30,6 @@ func handle(w http.ResponseWriter, _ *http.Request) {
 	data := []byte("\n")
 	_, err := w.Write(data)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 }

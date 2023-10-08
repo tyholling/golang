@@ -78,10 +78,10 @@ func (c *Client) handleSend(messages <-chan *pb.ConnectRequest) {
 	for msg := range messages {
 		err := c.stream.Send(msg)
 		if err != nil {
-			log.Print("failed to send: ", err)
+			log.Errorf("failed to send: %s", err)
 			continue
 		}
-		log.Printf("send: %s", msg)
+		log.Debugf("send: %s", msg)
 	}
 }
 
@@ -89,7 +89,7 @@ func (c *Client) handleRecv(messages chan<- *pb.ConnectRequest) {
 	for {
 		msg, err := c.stream.Recv()
 		if err != nil {
-			log.Print("failed to receive: ", err)
+			log.Errorf("failed to receive: %s", err)
 			c.reconnect()
 			continue
 		}
@@ -97,7 +97,7 @@ func (c *Client) handleRecv(messages chan<- *pb.ConnectRequest) {
 		if msg.Request != nil {
 			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
 			if err != nil {
-				log.Print(err)
+				log.Error(err)
 				continue
 			}
 			if v, ok := request.(*pb.Subscribe); ok {
@@ -108,14 +108,14 @@ func (c *Client) handleRecv(messages chan<- *pb.ConnectRequest) {
 					continue
 				}
 			}
-			log.Printf("received request: %s", request)
+			log.Debugf("received request: %s", request)
 		} else if msg.Response != nil {
 			response, err := anypb.UnmarshalNew(msg.Response, proto.UnmarshalOptions{})
 			if err != nil {
-				log.Print(err)
+				log.Error(err)
 				continue
 			}
-			log.Printf("received response: %s", response)
+			log.Debugf("received response: %s", response)
 		}
 	}
 }
@@ -127,7 +127,7 @@ func handleHeartbeat(messages chan<- *pb.ConnectRequest) {
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
-			log.Print(err)
+			log.Error(err)
 			continue
 		}
 		messages <- &pb.ConnectRequest{
@@ -143,7 +143,7 @@ func (c *Client) reconnect() {
 		stream, err := c.client.Connect(context.Background())
 		if err == nil {
 			c.stream = stream
-			log.Print("reconnected to server")
+			log.Debug("reconnected to server")
 			break
 		}
 		time.Sleep(time.Second)

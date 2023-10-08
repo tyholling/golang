@@ -72,7 +72,7 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		Type: pb.Subscription_SUBSCRIPTION_HEARTBEAT,
 	})
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 	}
 	messages <- &pb.ConnectResponse{
 		Request: request,
@@ -86,10 +86,10 @@ func handleSend(stream pb.ConnectionService_ConnectServer, messages <-chan *pb.C
 	for msg := range messages {
 		err := stream.Send(msg)
 		if err != nil {
-			log.Printf("failed to send: %s", err)
+			log.Errorf("failed to send: %s", err)
 			return
 		}
-		log.Printf("send: %s", msg)
+		log.Debugf("send: %s", msg)
 	}
 }
 
@@ -97,24 +97,24 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, _ chan<- *pb.ConnectR
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
-			log.Printf("failed to receive: %s", err)
+			log.Errorf("failed to receive: %s", err)
 			return
 		}
 
 		if msg.Request != nil {
 			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
 			if err != nil {
-				log.Print(err)
+				log.Error(err)
 				continue
 			}
-			log.Printf("received request: %s", request)
+			log.Debugf("received request: %s", request)
 		} else if msg.Response != nil {
 			response, err := anypb.UnmarshalNew(msg.Response, proto.UnmarshalOptions{})
 			if err != nil {
-				log.Print(err)
+				log.Error(err)
 				continue
 			}
-			log.Printf("received response: %s", response)
+			log.Debugf("received response: %s", response)
 		}
 	}
 }
