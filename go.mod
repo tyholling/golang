@@ -3,6 +3,7 @@ module github.com/tyholling/golang
 go 1.21.2
 
 require (
+	github.com/sirupsen/logrus v1.9.3
 	google.golang.org/grpc v1.58.2
 	google.golang.org/protobuf v1.31.0
 )

@@ -2,15 +2,26 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"sync"
 
+	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
+
+func main() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
+
+	server := &Server{}
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 type Server struct {
 	listener net.Listener
@@ -103,13 +114,5 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, _ chan<- *pb.ConnectR
 			}
 			log.Printf("received response: %s", response)
 		}
-	}
-}
-
-func main() {
-	server := &Server{}
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Fatal(err)
 	}
 }

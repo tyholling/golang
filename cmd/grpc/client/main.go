@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -14,6 +14,18 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+func main() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
+
+	client := &Client{}
+	err := client.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	client.Start()
+}
 
 type Client struct {
 	conn   *grpc.ClientConn
@@ -134,13 +146,4 @@ func (c *Client) reconnect() {
 		}
 		time.Sleep(time.Second)
 	}
-}
-
-func main() {
-	client := &Client{}
-	err := client.Connect()
-	if err != nil {
-		log.Fatal(err)
-	}
-	client.Start()
 }

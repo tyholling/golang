@@ -1,12 +1,16 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
+
 	http.HandleFunc("/", handle)
 
 	server := http.Server{
