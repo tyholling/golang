@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -15,6 +16,7 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetLevel(log.DebugLevel)
+	log.SetOutput(os.Stdout)
 
 	server := &Server{}
 	err := server.ListenAndServe()

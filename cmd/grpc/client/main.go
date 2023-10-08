@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetLevel(log.DebugLevel)
+	log.SetOutput(os.Stdout)
 
 	client := &Client{}
 	err := client.Connect()
