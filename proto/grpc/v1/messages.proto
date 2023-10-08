@@ -9,6 +9,7 @@ option go_package = "github.com/tyholling/golang/proto/grpc";
 enum Subscription {
   SUBSCRIPTION_UNSPECIFIED = 0;
   SUBSCRIPTION_HEARTBEAT = 1;
+  SUBSCRIPTION_METRICS = 2;
 }
 
 message Subscribe {
@@ -21,4 +22,9 @@ message Unsubscribe {
 
 message Heartbeat {
   google.protobuf.Timestamp timestamp = 1;
+}
+
+message Metrics {
+  double cpu_utilization = 1;
+  double memory_utilization = 2;
 }

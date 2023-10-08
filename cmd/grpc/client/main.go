@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/tyholling/golang/proto/grpc/v1"
 	"google.golang.org/grpc"
@@ -104,6 +106,8 @@ func (c *Client) handleRecv(messages chan<- *pb.ConnectRequest) {
 				switch v.Type {
 				case pb.Subscription_SUBSCRIPTION_HEARTBEAT:
 					go handleHeartbeat(messages)
+				case pb.Subscription_SUBSCRIPTION_METRICS:
+					go handleMetrics(messages)
 				case pb.Subscription_SUBSCRIPTION_UNSPECIFIED:
 					continue
 				}
@@ -117,6 +121,18 @@ func (c *Client) handleRecv(messages chan<- *pb.ConnectRequest) {
 			}
 			log.Debugf("received response: %s", response)
 		}
+	}
+}
+
+func (c *Client) reconnect() {
+	for {
+		stream, err := c.client.Connect(context.Background())
+		if err == nil {
+			c.stream = stream
+			log.Debug("reconnected to server")
+			break
+		}
+		time.Sleep(time.Second)
 	}
 }
 
@@ -138,14 +154,42 @@ func handleHeartbeat(messages chan<- *pb.ConnectRequest) {
 	}
 }
 
-func (c *Client) reconnect() {
+func handleMetrics(messages chan<- *pb.ConnectRequest) {
+	ticker := time.NewTicker(time.Minute)
+	metrics := &pb.Metrics{}
+
 	for {
-		stream, err := c.client.Connect(context.Background())
-		if err == nil {
-			c.stream = stream
-			log.Debug("reconnected to server")
-			break
+		pz, err := cpu.Percent(time.Second, false)
+		if err != nil {
+			log.Error(err)
+			continue
 		}
-		time.Sleep(time.Second)
+		if len(pz) == 0 {
+			log.Error("failed to retrieve cpu utilization")
+			continue
+		}
+		metrics.CpuUtilization = pz[0]
+
+		mz, err := mem.VirtualMemory()
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		if mz == nil {
+			log.Error("failed to retrieve memory utilization")
+			continue
+		}
+		metrics.MemoryUtilization = mz.UsedPercent
+
+		response, err := anypb.New(metrics)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		messages <- &pb.ConnectRequest{
+			Response: response,
+		}
+
+		<-ticker.C
 	}
 }

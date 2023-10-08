@@ -68,14 +68,24 @@ func (s *connectionServer) Connect(stream pb.ConnectionService_ConnectServer) er
 		handleRecv(stream, messages)
 	}()
 
-	request, err := anypb.New(&pb.Subscribe{
+	requestHeartbeat, err := anypb.New(&pb.Subscribe{
 		Type: pb.Subscription_SUBSCRIPTION_HEARTBEAT,
 	})
 	if err != nil {
 		log.Error(err)
 	}
 	messages <- &pb.ConnectResponse{
-		Request: request,
+		Request: requestHeartbeat,
+	}
+
+	requestMetrics, err := anypb.New(&pb.Subscribe{
+		Type: pb.Subscription_SUBSCRIPTION_METRICS,
+	})
+	if err != nil {
+		log.Error(err)
+	}
+	messages <- &pb.ConnectResponse{
+		Request: requestMetrics,
 	}
 
 	wg.Wait()
