@@ -6,7 +6,9 @@ WORKDIR /build
 
 COPY . .
 
-RUN --mount=type=cache,target=/go make setup build
+RUN make setup
+
+RUN make build
 
 FROM alpine
 
