@@ -1,5 +1,6 @@
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
   - depguard
   - exhaustruct
@@ -9,6 +10,3 @@ linters:
   - staticcheck
   - varnamelen
   - wsl
-
-  # deprecated
-  - tenv
