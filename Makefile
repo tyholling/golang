@@ -1,3 +1,9 @@
+ifeq ($(TARGETPLATFORM), linux/amd64)
+	GOARCH = amd64
+else ifeq ($(TARGETPLATFORM), linux/arm64)
+	GOARCH = arm64
+endif
+
 build: buf
 	go build -o bin/ ./...
 
