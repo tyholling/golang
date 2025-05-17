@@ -1,12 +1,14 @@
-FROM localhost:5000/builder as builder
+FROM docker.io/library/golang:1.24-bookworm as builder
 
-WORKDIR /root
+ARG TARGETPLATFORM
+
+WORKDIR /build
 
 COPY . .
 
-RUN make
+RUN --mount=type=bind,target=/go make setup build
 
-FROM docker.io/library/alpine
+FROM scratch
 
 COPY --from=builder /root/bin/server /server
 

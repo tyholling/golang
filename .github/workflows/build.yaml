@@ -25,14 +25,14 @@ jobs:
         go-version-file: go.mod
     - uses: golangci/golangci-lint-action@v8
 
-  amd64:
+  grpc-client-amd64:
     runs-on: ubuntu-24.04
-    needs: build
+    needs: check
     steps:
     - uses: actions/checkout@v4
 
     - uses: redhat-actions/buildah-build@v2
-      id: buildah
+      id: build-grpc-client
       with:
         containerFiles: containers/client
         image: golang-grpc-client
@@ -40,20 +40,62 @@ jobs:
 
     - uses: redhat-actions/push-to-registry@v2
       with:
-        image: ${{ steps.buildah.outputs.image }}
-        tags: ${{ steps.buildah.outputs.tags }}
+        image: ${{ steps.build-grpc-client.outputs.image }}
+        tags: ${{ steps.build-grpc-client.outputs.tags }}
         registry: ghcr.io/${{ github.repository_owner }}
         username: ${{ github.actor }}
         password: ${{ github.token }}
 
-  arm64:
-    runs-on: ubuntu-24.04-arm
-    needs: build
+  grpc-server-amd64:
+    runs-on: ubuntu-24.04
+    needs: check
     steps:
     - uses: actions/checkout@v4
 
     - uses: redhat-actions/buildah-build@v2
-      id: buildah
+      id: build-grpc-server
+      with:
+        containerFiles: containers/server
+        image: golang-grpc-server
+        tags: latest-amd64
+
+    - uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-grpc-server.outputs.image }}
+        tags: ${{ steps.build-grpc-server.outputs.tags }}
+        registry: ghcr.io/${{ github.repository_owner }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+  http-server-amd64:
+    runs-on: ubuntu-24.04
+    needs: check
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: redhat-actions/buildah-build@v2
+      id: build-http-server
+      with:
+        containerFiles: containers/http
+        image: golang-http-server
+        tags: latest-amd64
+
+    - uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-http-server.outputs.image }}
+        tags: ${{ steps.build-http-server.outputs.tags }}
+        registry: ghcr.io/${{ github.repository_owner }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+  grpc-client-arm64:
+    runs-on: ubuntu-24.04-arm
+    needs: check
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: redhat-actions/buildah-build@v2
+      id: build-grpc-client
       with:
         containerFiles: containers/client
         image: golang-grpc-client
@@ -61,8 +103,50 @@ jobs:
 
     - uses: redhat-actions/push-to-registry@v2
       with:
-        image: ${{ steps.buildah.outputs.image }}
-        tags: ${{ steps.buildah.outputs.tags }}
+        image: ${{ steps.build-grpc-client.outputs.image }}
+        tags: ${{ steps.build-grpc-client.outputs.tags }}
+        registry: ghcr.io/${{ github.repository_owner }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+  grpc-server-arm64:
+    runs-on: ubuntu-24.04-arm
+    needs: check
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: redhat-actions/buildah-build@v2
+      id: build-grpc-server
+      with:
+        containerFiles: containers/server
+        image: golang-grpc-server
+        tags: latest-arm64
+
+    - uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-grpc-server.outputs.image }}
+        tags: ${{ steps.build-grpc-server.outputs.tags }}
+        registry: ghcr.io/${{ github.repository_owner }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+  http-server-arm64:
+    runs-on: ubuntu-24.04-arm
+    needs: check
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: redhat-actions/buildah-build@v2
+      id: build-http-server
+      with:
+        containerFiles: containers/http
+        image: golang-http-server
+        tags: latest-arm64
+
+    - uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-http-server.outputs.image }}
+        tags: ${{ steps.build-http-server.outputs.tags }}
         registry: ghcr.io/${{ github.repository_owner }}
         username: ${{ github.actor }}
         password: ${{ github.token }}
