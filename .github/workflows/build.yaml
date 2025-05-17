@@ -34,14 +34,13 @@ jobs:
     - uses: redhat-actions/buildah-build@v2
       with:
         containerFiles: containers/client
-        context: .
         image: golang-grpc-client
-        platforms: linux/amd64
-        push: true
         tags: latest-amd64
 
-    - uses: redhat-actions/podman-login@v1
+    - uses: redhat-actions/push-to-registry@v2
       with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
         registry: ghcr.io/${{ github.repository_owner }}
         username: ${{ github.actor }}
         password: ${{ github.token }}
@@ -55,14 +54,13 @@ jobs:
     - uses: redhat-actions/buildah-build@v2
       with:
         containerFiles: containers/client
-        context: .
         image: golang-grpc-client
-        platforms: linux/arm64
-        push: true
         tags: latest-arm64
 
-    - uses: redhat-actions/podman-login@v1
+    - uses: redhat-actions/push-to-registry@v2
       with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
         registry: ghcr.io/${{ github.repository_owner }}
         username: ${{ github.actor }}
         password: ${{ github.token }}
