@@ -16,7 +16,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: /go
-        key: ${{ hashFiles("go.sum") }}
+        key: ${{ hashFiles('go.sum') }}
     - run: make setup build check
 
   podman:
