@@ -13,12 +13,16 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-    - run: make setup build check
+    - run: make setup build
 
   check:
     runs-on: ubuntu-24.04
     needs: build
     steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
     - uses: golangci/golangci-lint-action@v8
 
   amd64:
