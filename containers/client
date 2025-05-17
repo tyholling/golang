@@ -6,7 +6,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN --mount=type=cache,target=/go make build
+RUN --mount=type=cache,target=/go make setup build
 
 FROM scratch
 
