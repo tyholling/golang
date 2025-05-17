@@ -5,17 +5,10 @@ linters:
   - exhaustruct
   - funlen
   - nlreturn
+  - protogetter
+  - staticcheck
   - varnamelen
   - wsl
 
   # deprecated
-  - deadcode
-  - exhaustivestruct
-  - golint
-  - ifshort
-  - interfacer
-  - maligned
-  - nosnakecase
-  - scopelint
-  - structcheck
-  - varcheck
+  - tenv
