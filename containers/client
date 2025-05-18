@@ -8,7 +8,7 @@ COPY . .
 
 RUN make setup build
 
-FROM alpine
+FROM scratch
 
 COPY --from=builder /build/bin/client /client
 
