@@ -1,6 +1,8 @@
 server:
-  baseURL: http://192.168.64.100/prometheus
   prefixURL: /prometheus
+  baseURL: http://192.168.64.100/prometheus
+  persistentVolume:
+    enabled: false
 
 serverFiles:
   prometheus.yml:
@@ -9,3 +11,6 @@ serverFiles:
       static_configs:
       - targets:
         - server-http:8080
+
+alertmanager:
+  enabled: false
