@@ -86,23 +86,23 @@ func (c *Client) handleRecv(msgChan chan<- *pb.ConnectRequest) {
 			continue
 		}
 
-		if msg.Request != nil {
+		if msg.GetRequest() != nil {
 			log.Debugf("received request: %s", msg)
 
-			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
+			request, err := anypb.UnmarshalNew(msg.GetRequest(), proto.UnmarshalOptions{})
 			if err != nil {
 				log.Error(err)
 				continue
 			}
 			if v, ok := request.(*pb.Subscribe); ok {
-				switch v.Type {
+				switch v.GetType() {
 				case pb.SubscriptionType_HEARTBEAT:
 					go handleHeartbeat(msgChan)
 				case pb.SubscriptionType_METRICS:
 					go handleMetrics(msgChan)
 				}
 			}
-		} else if msg.Response != nil {
+		} else if msg.GetResponse() != nil {
 			log.Debugf("received response: %s", msg)
 		}
 	}

@@ -6,6 +6,5 @@ linters:
   - exhaustruct
   - funlen
   - nlreturn
-  - protogetter
   - varnamelen
   - wsl

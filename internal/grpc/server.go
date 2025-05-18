@@ -140,29 +140,29 @@ func handleRecv(stream pb.ConnectionService_ConnectServer, _ chan<- *pb.ConnectR
 			return
 		}
 
-		if msg.Request != nil {
-			request, err := anypb.UnmarshalNew(msg.Request, proto.UnmarshalOptions{})
+		if msg.GetRequest() != nil {
+			request, err := anypb.UnmarshalNew(msg.GetRequest(), proto.UnmarshalOptions{})
 			if err != nil {
 				log.Error(err)
 				continue
 			}
 			log.Debugf("received request: %s", request)
-		} else if msg.Response != nil {
-			response, err := anypb.UnmarshalNew(msg.Response, proto.UnmarshalOptions{})
+		} else if msg.GetResponse() != nil {
+			response, err := anypb.UnmarshalNew(msg.GetResponse(), proto.UnmarshalOptions{})
 			if err != nil {
 				log.Error(err)
 				continue
 			}
 			if v, ok := response.(*pb.Metrics); ok {
-				metrics.cpu.Set(v.Cpu)
-				metrics.memory.Set(v.Memory)
+				metrics.cpu.Set(v.GetCpu())
+				metrics.memory.Set(v.GetMemory())
 
-				metrics.bytesIn.Add(float64(v.BytesIn))
-				metrics.bytesOut.Add(float64(v.BytesOut))
-				metrics.errorsIn.Add(float64(v.ErrorsIn))
-				metrics.errorsOut.Add(float64(v.ErrorsOut))
-				metrics.discardsIn.Add(float64(v.DiscardsIn))
-				metrics.discardsOut.Add(float64(v.DiscardsOut))
+				metrics.bytesIn.Add(float64(v.GetBytesIn()))
+				metrics.bytesOut.Add(float64(v.GetBytesOut()))
+				metrics.errorsIn.Add(float64(v.GetErrorsIn()))
+				metrics.errorsOut.Add(float64(v.GetErrorsOut()))
+				metrics.discardsIn.Add(float64(v.GetDiscardsIn()))
+				metrics.discardsOut.Add(float64(v.GetDiscardsOut()))
 			}
 			log.Debugf("received response: %s", response)
 		}
