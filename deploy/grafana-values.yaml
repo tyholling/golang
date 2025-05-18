@@ -1,6 +1,6 @@
 grafana.ini:
   server:
-    root_url: http://localhost:3000/grafana
+    root_url: http://192.168.64.100/grafana
 
 datasources:
   datasources.yaml:

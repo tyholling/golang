@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: http
-        image: localhost:5000/http
+        image: ghcr.io/tyholling/golang-http-server:latest-arm64
         imagePullPolicy: Always
         ports:
         - containerPort: 80

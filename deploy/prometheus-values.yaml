@@ -1,5 +1,5 @@
 server:
-  baseURL: http://localhost:9090/prometheus
+  baseURL: http://192.168.64.100/prometheus
   prefixURL: /prometheus
 
 serverFiles:
