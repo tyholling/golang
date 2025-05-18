@@ -28,7 +28,7 @@ type Client struct {
 
 // Connect creates the grpc connection.
 func (c *Client) Connect() error {
-	target := "localhost:65000"
+	target := "192.168.64.101:65000"
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
