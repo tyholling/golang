@@ -7,6 +7,5 @@ linters:
   - funlen
   - nlreturn
   - protogetter
-  - staticcheck
   - varnamelen
   - wsl

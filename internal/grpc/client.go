@@ -30,7 +30,7 @@ type Client struct {
 func (c *Client) Connect() error {
 	target := "192.168.64.101:65000"
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	conn, err := grpc.Dial(target, opts...)
+	conn, err := grpc.NewClient(target, opts...)
 	if err != nil {
 		return fmt.Errorf("failed to connect to channel: %w", err)
 	}
