@@ -3,6 +3,7 @@ ifeq ($(TARGETPLATFORM), linux/amd64)
 else ifeq ($(TARGETPLATFORM), linux/arm64)
 	GOARCH = arm64
 endif
+CGO_ENABLED = 0
 
 build: buf
 	go build -o bin/ ./...
